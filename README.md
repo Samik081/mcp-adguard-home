@@ -6,6 +6,8 @@
 
 MCP server for [AdGuard Home](https://adguard.com/pl/adguard-home/overview.html). Manage DNS filtering, clients, DHCP, rewrites, and more through natural language in Cursor, Claude Code, and Claude Desktop.
 
+> **Disclaimer:** Most of this code has been AI-generated and has not been fully tested yet. I created this project for my own needs and plan to continue improving its quality, but it may be buggy in the early stages. If you find a bug, feel free to [open an issue](https://github.com/Samik081/mcp-adguard-home/issues) -- I'll try to work on it in my spare time.
+
 ## Features
 
 - **65 tools** across **16 API categories** covering the complete AdGuard Home API
