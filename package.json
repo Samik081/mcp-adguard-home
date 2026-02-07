@@ -39,6 +39,9 @@
     "url": "https://github.com/samik081/mcp-adguard-home/issues"
   },
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
     "zod": "^3.25.0"
