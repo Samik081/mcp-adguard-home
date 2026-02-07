@@ -23,7 +23,7 @@ Run the server directly with npx:
 ADGUARD_URL="http://your-adguard-ip:3000" \
 ADGUARD_USERNAME="your-username" \
 ADGUARD_PASSWORD="your-password" \
-npx @samik081/mcp-adguard-home
+npx -y @samik081/mcp-adguard-home
 ```
 
 The server validates your AdGuard Home connection on startup and fails immediately with a clear error if credentials are missing or invalid.
@@ -37,7 +37,7 @@ claude mcp add --transport stdio adguard-home \
   --env ADGUARD_URL=http://your-adguard-ip:3000 \
   --env ADGUARD_USERNAME=your-username \
   --env ADGUARD_PASSWORD=your-password \
-  -- npx @samik081/mcp-adguard-home
+  -- npx -y @samik081/mcp-adguard-home
 ```
 
 **JSON config** (works with Claude Code `.mcp.json`, Claude Desktop `claude_desktop_config.json`, Cursor `.cursor/mcp.json`):
@@ -47,7 +47,7 @@ claude mcp add --transport stdio adguard-home \
   "mcpServers": {
     "adguard-home": {
       "command": "npx",
-      "args": ["@samik081/mcp-adguard-home"],
+      "args": ["-y", "@samik081/mcp-adguard-home"],
       "env": {
         "ADGUARD_URL": "http://your-adguard-ip:3000",
         "ADGUARD_USERNAME": "your-username",
