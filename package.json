@@ -32,11 +32,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/samik081/mcp-adguard-home.git"
+    "url": "git+https://github.com/Samik081/mcp-adguard-home.git"
   },
-  "homepage": "https://github.com/samik081/mcp-adguard-home#readme",
+  "homepage": "https://github.com/Samik081/mcp-adguard-home#readme",
   "bugs": {
-    "url": "https://github.com/samik081/mcp-adguard-home/issues"
+    "url": "https://github.com/Samik081/mcp-adguard-home/issues"
   },
   "license": "MIT",
   "publishConfig": {
