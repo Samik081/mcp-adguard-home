@@ -6,9 +6,9 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { logger } from './logger.js';
+import pkg from '../../package.json' with { type: 'json' };
 
 const SERVER_NAME = 'mcp-adguard-home';
-const SERVER_VERSION = '1.0.0';
 
 /**
  * Create a new MCP server instance.
@@ -17,7 +17,7 @@ export function createServer(): McpServer {
   const server = new McpServer(
     {
       name: SERVER_NAME,
-      version: SERVER_VERSION,
+      version: pkg.version,
     },
     {
       capabilities: {
@@ -36,6 +36,6 @@ export function createServer(): McpServer {
  */
 export async function startServer(server: McpServer): Promise<void> {
   const transport = new StdioServerTransport();
-  logger.info(`${SERVER_NAME} v${SERVER_VERSION} listening on stdio`);
+  logger.info(`${SERVER_NAME} v${pkg.version} listening on stdio`);
   await server.connect(transport);
 }
