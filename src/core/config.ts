@@ -75,6 +75,17 @@ export function loadConfig(): AppConfig {
   const confirmDestructive =
     process.env.ADGUARD_CONFIRM_DESTRUCTIVE?.toLowerCase() === 'true';
 
+  const transport =
+    process.env.MCP_TRANSPORT === 'http' ? ('http' as const) : ('stdio' as const);
+  const rawPort = process.env.MCP_PORT ?? '3000';
+  const httpPort = parseInt(rawPort, 10);
+  if (isNaN(httpPort) || httpPort < 1 || httpPort > 65535) {
+    throw new Error(
+      `Invalid MCP_PORT: "${rawPort}". Must be an integer between 1 and 65535.`,
+    );
+  }
+  const httpHost = process.env.MCP_HOST ?? '0.0.0.0';
+
   return {
     url: url!.replace(/\/+$/, ''), // Strip trailing slashes
     username: username!,
@@ -83,5 +94,8 @@ export function loadConfig(): AppConfig {
     categories,
     debug,
     confirmDestructive,
+    transport,
+    httpPort,
+    httpHost,
   };
 }

@@ -1,4 +1,5 @@
 [![npm version](https://img.shields.io/npm/v/@samik081/mcp-adguard-home)](https://www.npmjs.com/package/@samik081/mcp-adguard-home)
+[![Docker image](https://ghcr-badge.egpl.dev/samik081/mcp-adguard-home/latest_tag?trim=major&label=docker)](https://ghcr.io/samik081/mcp-adguard-home)
 [![License: MIT](https://img.shields.io/npm/l/@samik081/mcp-adguard-home)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/node/v/@samik081/mcp-adguard-home)](https://nodejs.org)
 
@@ -15,6 +16,8 @@ MCP server for [AdGuard Home](https://adguard.com/pl/adguard-home/overview.html)
 - **Category filtering** via `ADGUARD_CATEGORIES` to expose only the tools you need
 - **Destructive operation guard** with optional confirmation for reset/delete operations
 - **Zero HTTP dependencies** -- uses native `fetch` (Node.js 18+)
+- **Docker images** for `linux/amd64` and `linux/arm64` on [GHCR](https://ghcr.io/samik081/mcp-adguard-home)
+- **Remote MCP** via HTTP transport (`MCP_TRANSPORT=http`) using the Streamable HTTP protocol
 - **TypeScript/ESM** with full type safety
 
 ## Quick Start
@@ -30,16 +33,49 @@ npx -y @samik081/mcp-adguard-home
 
 The server validates your AdGuard Home connection on startup and fails immediately with a clear error if credentials are missing or invalid.
 
+### Docker
+
+Run with Docker (stdio transport, same as npx):
+
+```bash
+docker run --rm -i \
+  -e ADGUARD_URL=http://your-adguard-ip:3000 \
+  -e ADGUARD_USERNAME=your-username \
+  -e ADGUARD_PASSWORD=your-password \
+  ghcr.io/samik081/mcp-adguard-home
+```
+
+To run as a remote MCP server with HTTP transport:
+
+```bash
+docker run -d -p 3000:3000 \
+  -e MCP_TRANSPORT=http \
+  -e ADGUARD_URL=http://your-adguard-ip:3000 \
+  -e ADGUARD_USERNAME=your-username \
+  -e ADGUARD_PASSWORD=your-password \
+  ghcr.io/samik081/mcp-adguard-home
+```
+
+The MCP endpoint is available at `http://localhost:3000/mcp` and a health check at `http://localhost:3000/health`.
+
 ## Configuration
 
 **Claude Code CLI (recommended):**
 
 ```bash
+# Using npx
 claude mcp add --transport stdio adguard-home \
   --env ADGUARD_URL=http://your-adguard-ip:3000 \
   --env ADGUARD_USERNAME=your-username \
   --env ADGUARD_PASSWORD=your-password \
   -- npx -y @samik081/mcp-adguard-home
+
+# Using Docker
+claude mcp add --transport stdio adguard-home \
+  --env ADGUARD_URL=http://your-adguard-ip:3000 \
+  --env ADGUARD_USERNAME=your-username \
+  --env ADGUARD_PASSWORD=your-password \
+  -- docker run --rm -i ghcr.io/samik081/mcp-adguard-home
 ```
 
 **JSON config** (works with Claude Code `.mcp.json`, Claude Desktop `claude_desktop_config.json`, Cursor `.cursor/mcp.json`):
@@ -60,6 +96,51 @@ claude mcp add --transport stdio adguard-home \
 }
 ```
 
+**Docker (stdio):**
+
+```json
+{
+  "mcpServers": {
+    "adguard-home": {
+      "command": "docker",
+      "args": ["run", "--rm", "-i",
+        "-e", "ADGUARD_URL=http://your-adguard-ip:3000",
+        "-e", "ADGUARD_USERNAME=your-username",
+        "-e", "ADGUARD_PASSWORD=your-password",
+        "ghcr.io/samik081/mcp-adguard-home"
+      ]
+    }
+  }
+}
+```
+
+**Remote MCP** (connect to a running Docker container or HTTP server):
+
+```json
+{
+  "mcpServers": {
+    "adguard-home": {
+      "type": "streamable-http",
+      "url": "http://localhost:3000/mcp"
+    }
+  }
+}
+```
+
+## Access Tiers
+
+Control which tools are available using the `ADGUARD_ACCESS_TIER` environment variable:
+
+| Tier | Tools | Description |
+|------|-------|-------------|
+| `full` (default) | 65 | Read and write -- full control |
+| `read-only` | 29 | Read only -- safe for monitoring, no state changes |
+
+- **full**: All 65 tools. Includes configuration changes, adding/removing filters, clearing logs, and all destructive operations.
+- **read-only**: 29 tools. Status, configuration viewing, and query log reading only. No state changes.
+
+Tools that are not available in your tier are not registered with the MCP server. They will not appear in your AI tool's tool list, keeping the context clean.
+
 ## Environment Variables
 
 | Variable | Required | Default | Description |
@@ -71,6 +152,9 @@ claude mcp add --transport stdio adguard-home \
 | `ADGUARD_CATEGORIES` | No | *(all)* | Comma-separated category allowlist (e.g., `dns,filtering,stats`) |
 | `ADGUARD_CONFIRM_DESTRUCTIVE` | No | `false` | Require `confirm: true` parameter for destructive operations |
 | `DEBUG` | No | `false` | Enable debug logging to stderr |
+| `MCP_TRANSPORT` | No | `stdio` | Transport mode: `stdio` (default) or `http` |
+| `MCP_PORT` | No | `3000` | HTTP server port (only used when `MCP_TRANSPORT=http`) |
+| `MCP_HOST` | No | `0.0.0.0` | HTTP server bind address (only used when `MCP_TRANSPORT=http`) |
 
 ### Available Categories
 

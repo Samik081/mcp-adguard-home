@@ -44,8 +44,7 @@ async function main(): Promise<void> {
   // Register all tools (categories and access tier are filtered internally)
   registerAllTools(server, client, config);
 
-  // Start listening on stdio transport
-  await startServer(server);
+  await startServer(server, config);
 }
 
 main().catch((err) => {

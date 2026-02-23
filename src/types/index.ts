@@ -59,6 +59,9 @@ export interface AppConfig {
   categories: ToolCategory[] | null;
   debug: boolean;
   confirmDestructive: boolean;
+  transport: 'stdio' | 'http';
+  httpPort: number;
+  httpHost: string;
 }
 
 /**
