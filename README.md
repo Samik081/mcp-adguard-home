@@ -56,7 +56,7 @@ docker run -d -p 3000:3000 \
   ghcr.io/samik081/mcp-adguard-home
 ```
 
-The MCP endpoint is available at `http://localhost:3000/mcp` and a health check at `http://localhost:3000/health`.
+The MCP endpoint is available at `http://localhost:3000` and a health check at `http://localhost:3000/health`.
 
 ## Configuration
 
@@ -76,6 +76,9 @@ claude mcp add --transport stdio adguard-home \
   --env ADGUARD_USERNAME=your-username \
   --env ADGUARD_PASSWORD=your-password \
   -- docker run --rm -i ghcr.io/samik081/mcp-adguard-home
+
+# Using remote HTTP (connect to a running Docker container or HTTP server)
+claude mcp add --transport http adguard-home http://localhost:3000
 ```
 
 **JSON config** (works with Claude Code `.mcp.json`, Claude Desktop `claude_desktop_config.json`, Cursor `.cursor/mcp.json`):
@@ -121,7 +124,7 @@ claude mcp add --transport stdio adguard-home \
   "mcpServers": {
     "adguard-home": {
       "type": "streamable-http",
-      "url": "http://localhost:3000/mcp"
+      "url": "http://localhost:3000"
     }
   }
 }
