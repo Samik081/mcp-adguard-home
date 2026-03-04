@@ -48,6 +48,7 @@ export function registerRewritesTools(
       description: 'Retrieve all configured DNS rewrite rules',
       category: 'rewrites',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get('rewrite/list')) as RewriteRule[];
@@ -64,6 +65,7 @@ export function registerRewritesTools(
       description: 'Retrieve DNS rewrite module enabled/disabled state',
       category: 'rewrites',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get(
@@ -84,6 +86,7 @@ export function registerRewritesTools(
       description: 'Add a new DNS rewrite rule',
       category: 'rewrites',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
       inputSchema: {
         domain: z.string().describe('Domain pattern to rewrite'),
         answer: z.string().describe('Answer to return (IP address, domain, or special value)'),
@@ -106,6 +109,7 @@ export function registerRewritesTools(
         'Update a DNS rewrite rule (removes existing rule and adds updated one)',
       category: 'rewrites',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         domain: z.string().describe('Current domain of the rule to update'),
         answer: z.string().describe('Current answer of the rule to update'),
@@ -144,6 +148,7 @@ export function registerRewritesTools(
         'Delete a DNS rewrite rule (both domain and answer must match)',
       category: 'rewrites',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
       inputSchema: {
         domain: z.string().describe('Domain of the rule to delete'),
         answer: z.string().describe('Answer of the rule to delete'),
@@ -165,6 +170,7 @@ export function registerRewritesTools(
       description: 'Enable or disable the DNS rewrite module',
       category: 'rewrites',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         enabled: z.boolean().describe('Whether to enable or disable DNS rewrites'),
       },

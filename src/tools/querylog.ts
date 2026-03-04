@@ -107,6 +107,7 @@ export function registerQuerylogTools(
         'Search DNS query log with optional filtering by response status, search term, and pagination',
       category: 'querylog',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {
         older_than: z.string().optional(),
         offset: z.number().optional(),
@@ -153,6 +154,7 @@ export function registerQuerylogTools(
       description: 'Retrieve query log configuration settings',
       category: 'querylog',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get('querylog/config')) as QueryLogConfig;
@@ -172,6 +174,7 @@ export function registerQuerylogTools(
         'Update query log configuration. All fields are optional -- only provided fields are changed.',
       category: 'querylog',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         enabled: z.boolean().optional().describe('Enable/disable query logging'),
         interval: z
@@ -204,6 +207,7 @@ export function registerQuerylogTools(
         'Clear the entire DNS query log. This is a destructive operation that cannot be undone.',
       category: 'querylog',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         confirm: z
           .boolean()

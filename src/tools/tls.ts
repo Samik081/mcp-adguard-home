@@ -106,6 +106,7 @@ export function registerTlsTools(
         'Retrieve TLS configuration and certificate validation status',
       category: 'tls',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get('tls/status')) as TlsStatus;
@@ -123,6 +124,7 @@ export function registerTlsTools(
         'Validate TLS configuration without applying changes. Tests certificate and key validity.',
       category: 'tls',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {
         certificate_chain: z
           .string()
@@ -182,6 +184,7 @@ export function registerTlsTools(
         'Update TLS configuration including certificates and HTTPS/DoH/DoT settings',
       category: 'tls',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         enabled: z.boolean().optional().describe('Enable or disable TLS'),
         server_name: z.string().optional().describe('Server hostname'),

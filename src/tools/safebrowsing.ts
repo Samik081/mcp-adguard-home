@@ -23,6 +23,7 @@ export function registerSafebrowsingTools(
         'Retrieve safe browsing (malware/phishing protection) status',
       category: 'safebrowsing',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get('safebrowsing/status')) as {
@@ -44,6 +45,7 @@ export function registerSafebrowsingTools(
         'Enable or disable safe browsing (malware/phishing protection)',
       category: 'safebrowsing',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         enabled: z.boolean().describe('Whether safe browsing should be enabled'),
       },

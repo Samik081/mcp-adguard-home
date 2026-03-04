@@ -128,6 +128,7 @@ export function registerFilteringTools(
         'Retrieve filtering configuration including blocklists, allowlists, user rules, and global enabled state',
       category: 'filtering',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get(
@@ -147,6 +148,7 @@ export function registerFilteringTools(
         'Test whether a hostname would be blocked by current filtering rules',
       category: 'filtering',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {
         name: z.string(),
         client: z.string().optional(),
@@ -176,6 +178,7 @@ export function registerFilteringTools(
         'Update global filtering configuration (enabled state and update interval). Both fields are required -- this is a full replacement.',
       category: 'filtering',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         enabled: z.boolean().describe('Whether filtering is globally enabled'),
         interval: z.number().describe('Filter update interval in hours'),
@@ -199,6 +202,7 @@ export function registerFilteringTools(
         'Add a new filter URL (blocklist or allowlist)',
       category: 'filtering',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
       inputSchema: {
         name: z.string().describe('Display name for the filter'),
         url: z.string().describe('URL of the filter list'),
@@ -226,6 +230,7 @@ export function registerFilteringTools(
       description: 'Remove a filter URL from blocklist or allowlist',
       category: 'filtering',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
       inputSchema: {
         url: z.string().describe('URL of the filter to remove'),
         whitelist: z
@@ -251,6 +256,7 @@ export function registerFilteringTools(
         'Update an existing filter URL (rename, change URL, or enable/disable)',
       category: 'filtering',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         url: z.string().describe('Current URL of the filter to update'),
         whitelist: z
@@ -281,6 +287,7 @@ export function registerFilteringTools(
       description: 'Force refresh of filter lists to fetch latest updates',
       category: 'filtering',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         whitelist: z
           .boolean()
@@ -307,6 +314,7 @@ export function registerFilteringTools(
       description: 'Set custom filtering rules (replaces all existing custom rules)',
       category: 'filtering',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         rules: z
           .array(z.string())

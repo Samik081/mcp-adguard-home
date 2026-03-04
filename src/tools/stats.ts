@@ -96,6 +96,7 @@ export function registerStatsTools(
         'Retrieve DNS statistics including top domains, blocked counts, and client activity. Optional recent param is milliseconds (must be hourly multiple of 3600000).',
       category: 'stats',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {
         recent: z.number().optional(),
       },
@@ -120,6 +121,7 @@ export function registerStatsTools(
       description: 'Retrieve statistics configuration settings',
       category: 'stats',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get('stats/config')) as StatsConfig;
@@ -139,6 +141,7 @@ export function registerStatsTools(
         'Reset all DNS statistics. This is a destructive operation that cannot be undone.',
       category: 'stats',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         confirm: z
           .boolean()
@@ -164,6 +167,7 @@ export function registerStatsTools(
         'Update statistics configuration. All fields are optional -- only provided fields are changed.',
       category: 'stats',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         enabled: z.boolean().optional().describe('Enable/disable statistics collection'),
         interval: z

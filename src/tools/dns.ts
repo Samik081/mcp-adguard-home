@@ -109,6 +109,7 @@ export function registerDnsTools(
         'Retrieve full DNS server configuration including upstreams, bootstrap servers, cache settings, blocking mode, and DNSSEC status',
       category: 'dns',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get('dns_info')) as DnsInfo;
@@ -126,6 +127,7 @@ export function registerDnsTools(
         'Test upstream DNS server configuration to verify servers are reachable and responding',
       category: 'dns',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {
         upstream_dns: z.array(z.string()),
         bootstrap_dns: z.array(z.string()),
@@ -161,6 +163,7 @@ export function registerDnsTools(
         'Update DNS server configuration. All fields are optional -- only provided fields are changed.',
       category: 'dns',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         upstream_dns: z.array(z.string()).optional().describe('Upstream DNS server URLs'),
         bootstrap_dns: z.array(z.string()).optional().describe('Bootstrap DNS server URLs'),
@@ -210,6 +213,7 @@ export function registerDnsTools(
       description: 'Clear the DNS resolver cache',
       category: 'dns',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         await client.post('cache_clear');

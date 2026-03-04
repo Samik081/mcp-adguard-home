@@ -97,6 +97,7 @@ export function registerGlobalTools(
         'Retrieve AdGuard Home server status including version, DNS addresses, protection state, and ports',
       category: 'global',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get('status')) as StatusResponse;
@@ -113,6 +114,7 @@ export function registerGlobalTools(
       description: 'Retrieve user profile (name, language, theme)',
       category: 'global',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get('profile')) as ProfileResponse;
@@ -130,6 +132,7 @@ export function registerGlobalTools(
         'Check for AdGuard Home updates and compare with current version',
       category: 'global',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {
         recheck_now: z.boolean().optional(),
       },
@@ -157,6 +160,7 @@ export function registerGlobalTools(
         'Enable or disable DNS protection globally, with optional duration for temporary disable',
       category: 'global',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         enabled: z.boolean().describe('Whether DNS protection should be enabled'),
         duration: z
@@ -196,6 +200,7 @@ export function registerGlobalTools(
         'Update user profile settings (name, language, theme). All fields are optional -- only provided fields are updated.',
       category: 'global',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         name: z.string().optional().describe('Display name'),
         language: z.string().optional().describe('Language code (e.g. "en")'),
@@ -224,6 +229,7 @@ export function registerGlobalTools(
         'Initiate an AdGuard Home software update. The server may restart after this operation.',
       category: 'global',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
       inputSchema: {},
       handler: async () => {
         await client.post('update');

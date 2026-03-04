@@ -26,6 +26,7 @@ export function registerMobileConfigTools(
         'Generate Apple .mobileconfig profile for DNS-over-HTTPS. Returns raw XML plist.',
       category: 'mobile_config',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {
         host: z.string().describe('Server hostname for DoH'),
         client_id: z
@@ -55,6 +56,7 @@ export function registerMobileConfigTools(
         'Generate Apple .mobileconfig profile for DNS-over-TLS. Returns raw XML plist.',
       category: 'mobile_config',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {
         host: z.string().describe('Server hostname for DoT'),
         client_id: z

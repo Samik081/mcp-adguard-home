@@ -24,6 +24,7 @@ export function registerParentalTools(
       description: 'Retrieve parental filtering status',
       category: 'parental',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         // CRITICAL: API returns { enable: boolean } not { enabled: boolean }
@@ -45,6 +46,7 @@ export function registerParentalTools(
       description: 'Enable or disable parental filtering (content restrictions)',
       category: 'parental',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         enabled: z.boolean().describe('Whether parental filtering should be enabled'),
       },
