@@ -76,6 +76,7 @@ export function registerInstallTools(
         'Retrieve network interface details and ports for initial setup',
       category: 'install',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get(
@@ -110,6 +111,7 @@ export function registerInstallTools(
         'Validate install configuration without applying (checks web/DNS binding, credentials)',
       category: 'install',
       accessTier: 'full',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: installConfigSchema,
       handler: async (args) => {
         const body = {
@@ -143,6 +145,7 @@ export function registerInstallTools(
         'Apply initial setup configuration (web/DNS binding and admin credentials)',
       category: 'install',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
       inputSchema: installConfigSchema,
       handler: async (args) => {
         const body = {

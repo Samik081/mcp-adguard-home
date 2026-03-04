@@ -64,6 +64,7 @@ export function registerSafesearchTools(
         'Retrieve safe search settings showing per-engine enforcement status',
       category: 'safesearch',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get(
@@ -85,6 +86,7 @@ export function registerSafesearchTools(
         'Update safe search settings. Set global enabled state and optionally configure per-engine enforcement.',
       category: 'safesearch',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         enabled: z.boolean().describe('Whether safe search is globally enabled'),
         bing: z.boolean().optional().describe('Enforce safe search on Bing'),

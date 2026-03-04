@@ -131,6 +131,7 @@ export function registerClientsTools(
         'Retrieve all configured and auto-detected clients with their settings',
       category: 'clients',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get('clients')) as ClientsResponse;
@@ -148,6 +149,7 @@ export function registerClientsTools(
         'Search for specific clients by their IDs (IP, MAC, CIDR, or client ID)',
       category: 'clients',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {
         ids: z.array(z.string()).describe('Client identifiers to search for'),
       },
@@ -186,6 +188,7 @@ export function registerClientsTools(
         'Add a new persistent client with per-client settings',
       category: 'clients',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
       inputSchema: {
         name: z.string().describe('Client display name'),
         ids: z
@@ -254,6 +257,7 @@ export function registerClientsTools(
         'Update an existing persistent client by name',
       category: 'clients',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         name: z.string().describe('Name of the client to update'),
         data: z.object({
@@ -296,6 +300,7 @@ export function registerClientsTools(
         'Delete a persistent client by name',
       category: 'clients',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
       inputSchema: {
         name: z.string().describe('Name of the client to delete'),
       },

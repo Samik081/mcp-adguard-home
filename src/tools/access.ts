@@ -59,6 +59,7 @@ export function registerAccessTools(
         'Retrieve access control lists: allowed clients, disallowed clients, and blocked hosts',
       category: 'access',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get('access/list')) as AccessList;
@@ -78,6 +79,7 @@ export function registerAccessTools(
         'Set access control lists for allowed clients, disallowed clients, and blocked hosts',
       category: 'access',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         allowed_clients: z
           .array(z.string())

@@ -175,6 +175,7 @@ export function registerDhcpTools(
         'Retrieve DHCP server configuration, static leases, and active leases',
       category: 'dhcp',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get('dhcp/status')) as DhcpStatus;
@@ -192,6 +193,7 @@ export function registerDhcpTools(
         'Retrieve available network interfaces for DHCP server binding',
       category: 'dhcp',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get(
@@ -211,6 +213,7 @@ export function registerDhcpTools(
         'Scan for competing DHCP servers on a network interface (may take several seconds)',
       category: 'dhcp',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {
         interface: z.string().describe('Network interface name to scan'),
       },
@@ -235,6 +238,7 @@ export function registerDhcpTools(
         'Update DHCP server configuration (enabled state, interface, IPv4/IPv6 settings)',
       category: 'dhcp',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         enabled: z.boolean().optional().describe('Enable or disable DHCP server'),
         interface_name: z
@@ -287,6 +291,7 @@ export function registerDhcpTools(
       description: 'Add a static DHCP lease mapping a MAC address to an IP',
       category: 'dhcp',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
       inputSchema: {
         mac: z.string().describe('MAC address'),
         ip: z.string().describe('IP address to assign'),
@@ -311,6 +316,7 @@ export function registerDhcpTools(
         'Remove a static DHCP lease (all three fields must match the existing lease)',
       category: 'dhcp',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
       inputSchema: {
         mac: z.string().describe('MAC address of the lease to remove'),
         ip: z.string().describe('IP address of the lease to remove'),
@@ -335,6 +341,7 @@ export function registerDhcpTools(
         'Update a static DHCP lease (removes existing lease and adds a new one)',
       category: 'dhcp',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         mac: z.string().describe('Current MAC address of the lease'),
         ip: z.string().describe('Current IP address of the lease'),
@@ -381,6 +388,7 @@ export function registerDhcpTools(
         'Reset DHCP configuration to defaults (destructive -- may require confirmation)',
       category: 'dhcp',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         confirm: z
           .boolean()
@@ -406,6 +414,7 @@ export function registerDhcpTools(
         'Clear all DHCP leases (destructive -- may require confirmation)',
       category: 'dhcp',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         confirm: z
           .boolean()

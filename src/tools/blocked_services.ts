@@ -111,6 +111,7 @@ export function registerBlockedServicesTools(
         'List all available services that can be blocked, organized by group',
       category: 'blocked_services',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get(
@@ -130,6 +131,7 @@ export function registerBlockedServicesTools(
         'Retrieve currently blocked services list and schedule',
       category: 'blocked_services',
       accessTier: 'read-only',
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get(
@@ -151,6 +153,7 @@ export function registerBlockedServicesTools(
         'Update the list of blocked services and optional schedule',
       category: 'blocked_services',
       accessTier: 'full',
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: {
         ids: z
           .array(z.string())
