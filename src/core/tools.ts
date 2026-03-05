@@ -49,6 +49,7 @@ export function registerTool(
   server.registerTool(
     registration.name,
     {
+      ...(!config.excludeToolTitles && { title: registration.title }),
       description: registration.description,
       inputSchema: registration.inputSchema as Record<string, never>,
       annotations,

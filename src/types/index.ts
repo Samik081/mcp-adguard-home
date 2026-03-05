@@ -57,6 +57,7 @@ export interface AppConfig {
   password: string;
   accessTier: AccessTier;
   categories: ToolCategory[] | null;
+  excludeToolTitles: boolean;
   debug: boolean;
   transport: 'stdio' | 'http';
   httpPort: number;
@@ -71,6 +72,7 @@ export interface AppConfig {
  */
 export interface ToolRegistration {
   name: string;
+  title: string;
   description: string;
   category: ToolCategory;
   accessTier: AccessTier;

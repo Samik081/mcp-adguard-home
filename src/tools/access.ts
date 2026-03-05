@@ -55,6 +55,7 @@ export function registerAccessTools(
     server,
     {
       name: 'access_get_list',
+      title: 'Get Access Control List',
       description:
         'Retrieve access control lists: allowed clients, disallowed clients, and blocked hosts',
       category: 'access',
@@ -75,6 +76,7 @@ export function registerAccessTools(
     server,
     {
       name: 'access_set_list',
+      title: 'Set Access Control List',
       description:
         'Set access control lists for allowed clients, disallowed clients, and blocked hosts',
       category: 'access',

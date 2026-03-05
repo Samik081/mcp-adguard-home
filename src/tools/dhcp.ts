@@ -171,6 +171,7 @@ export function registerDhcpTools(
     server,
     {
       name: 'dhcp_get_status',
+      title: 'Get DHCP Status',
       description:
         'Retrieve DHCP server configuration, static leases, and active leases',
       category: 'dhcp',
@@ -189,6 +190,7 @@ export function registerDhcpTools(
     server,
     {
       name: 'dhcp_get_interfaces',
+      title: 'Get DHCP Interfaces',
       description:
         'Retrieve available network interfaces for DHCP server binding',
       category: 'dhcp',
@@ -209,6 +211,7 @@ export function registerDhcpTools(
     server,
     {
       name: 'dhcp_find_active',
+      title: 'Find Active DHCP Servers',
       description:
         'Scan for competing DHCP servers on a network interface (may take several seconds)',
       category: 'dhcp',
@@ -234,6 +237,7 @@ export function registerDhcpTools(
     server,
     {
       name: 'dhcp_set_config',
+      title: 'Set DHCP Configuration',
       description:
         'Update DHCP server configuration (enabled state, interface, IPv4/IPv6 settings)',
       category: 'dhcp',
@@ -288,6 +292,7 @@ export function registerDhcpTools(
     server,
     {
       name: 'dhcp_add_static_lease',
+      title: 'Add DHCP Static Lease',
       description: 'Add a static DHCP lease mapping a MAC address to an IP',
       category: 'dhcp',
       accessTier: 'full',
@@ -312,6 +317,7 @@ export function registerDhcpTools(
     server,
     {
       name: 'dhcp_remove_static_lease',
+      title: 'Remove DHCP Static Lease',
       description:
         'Remove a static DHCP lease (all three fields must match the existing lease)',
       category: 'dhcp',
@@ -337,6 +343,7 @@ export function registerDhcpTools(
     server,
     {
       name: 'dhcp_update_static_lease',
+      title: 'Update DHCP Static Lease',
       description:
         'Update a static DHCP lease (removes existing lease and adds a new one)',
       category: 'dhcp',
@@ -384,6 +391,7 @@ export function registerDhcpTools(
     server,
     {
       name: 'dhcp_reset',
+      title: 'Reset DHCP Configuration',
       description:
         'Reset DHCP configuration to defaults. This is a destructive operation that cannot be undone.',
       category: 'dhcp',
@@ -402,6 +410,7 @@ export function registerDhcpTools(
     server,
     {
       name: 'dhcp_reset_leases',
+      title: 'Reset DHCP Leases',
       description:
         'Clear all DHCP leases. This is a destructive operation that cannot be undone.',
       category: 'dhcp',

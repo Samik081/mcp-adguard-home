@@ -72,6 +72,7 @@ export function registerInstallTools(
     server,
     {
       name: 'install_get_addresses',
+      title: 'Get Install Addresses',
       description:
         'Retrieve network interface details and ports for initial setup',
       category: 'install',
@@ -107,6 +108,7 @@ export function registerInstallTools(
     server,
     {
       name: 'install_check_config',
+      title: 'Check Install Configuration',
       description:
         'Validate install configuration without applying (checks web/DNS binding, credentials)',
       category: 'install',
@@ -141,6 +143,7 @@ export function registerInstallTools(
     server,
     {
       name: 'install_apply_config',
+      title: 'Apply Install Configuration',
       description:
         'Apply initial setup configuration (web/DNS binding and admin credentials)',
       category: 'install',

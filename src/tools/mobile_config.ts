@@ -22,6 +22,7 @@ export function registerMobileConfigTools(
     server,
     {
       name: 'mobile_config_get_doh',
+      title: 'Get DoH Mobile Config',
       description:
         'Generate Apple .mobileconfig profile for DNS-over-HTTPS. Returns raw XML plist.',
       category: 'mobile_config',
@@ -52,6 +53,7 @@ export function registerMobileConfigTools(
     server,
     {
       name: 'mobile_config_get_dot',
+      title: 'Get DoT Mobile Config',
       description:
         'Generate Apple .mobileconfig profile for DNS-over-TLS. Returns raw XML plist.',
       category: 'mobile_config',

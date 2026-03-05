@@ -103,6 +103,7 @@ export function registerQuerylogTools(
     server,
     {
       name: 'querylog_get',
+      title: 'Get Query Log',
       description:
         'Search DNS query log with optional filtering by response status, search term, and pagination',
       category: 'querylog',
@@ -151,6 +152,7 @@ export function registerQuerylogTools(
     server,
     {
       name: 'querylog_get_config',
+      title: 'Get Query Log Configuration',
       description: 'Retrieve query log configuration settings',
       category: 'querylog',
       accessTier: 'read-only',
@@ -170,6 +172,7 @@ export function registerQuerylogTools(
     server,
     {
       name: 'querylog_set_config',
+      title: 'Set Query Log Configuration',
       description:
         'Update query log configuration. All fields are optional -- only provided fields are changed.',
       category: 'querylog',
@@ -203,6 +206,7 @@ export function registerQuerylogTools(
     server,
     {
       name: 'querylog_clear',
+      title: 'Clear Query Log',
       description:
         'Clear the entire DNS query log. This is a destructive operation that cannot be undone.',
       category: 'querylog',

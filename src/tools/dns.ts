@@ -105,6 +105,7 @@ export function registerDnsTools(
     server,
     {
       name: 'dns_get_info',
+      title: 'Get DNS Configuration',
       description:
         'Retrieve full DNS server configuration including upstreams, bootstrap servers, cache settings, blocking mode, and DNSSEC status',
       category: 'dns',
@@ -123,6 +124,7 @@ export function registerDnsTools(
     server,
     {
       name: 'dns_test_upstream',
+      title: 'Test Upstream DNS Servers',
       description:
         'Test upstream DNS server configuration to verify servers are reachable and responding',
       category: 'dns',
@@ -159,6 +161,7 @@ export function registerDnsTools(
     server,
     {
       name: 'dns_set_config',
+      title: 'Set DNS Configuration',
       description:
         'Update DNS server configuration. All fields are optional -- only provided fields are changed.',
       category: 'dns',
@@ -210,6 +213,7 @@ export function registerDnsTools(
     server,
     {
       name: 'dns_clear_cache',
+      title: 'Clear DNS Cache',
       description: 'Clear the DNS resolver cache',
       category: 'dns',
       accessTier: 'full',

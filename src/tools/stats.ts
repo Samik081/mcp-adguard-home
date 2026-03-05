@@ -92,6 +92,7 @@ export function registerStatsTools(
     server,
     {
       name: 'stats_get',
+      title: 'Get Statistics',
       description:
         'Retrieve DNS statistics including top domains, blocked counts, and client activity. Optional recent param is milliseconds (must be hourly multiple of 3600000).',
       category: 'stats',
@@ -118,6 +119,7 @@ export function registerStatsTools(
     server,
     {
       name: 'stats_get_config',
+      title: 'Get Statistics Configuration',
       description: 'Retrieve statistics configuration settings',
       category: 'stats',
       accessTier: 'read-only',
@@ -137,6 +139,7 @@ export function registerStatsTools(
     server,
     {
       name: 'stats_reset',
+      title: 'Reset Statistics',
       description:
         'Reset all DNS statistics. This is a destructive operation that cannot be undone.',
       category: 'stats',
@@ -155,6 +158,7 @@ export function registerStatsTools(
     server,
     {
       name: 'stats_set_config',
+      title: 'Set Statistics Configuration',
       description:
         'Update statistics configuration. All fields are optional -- only provided fields are changed.',
       category: 'stats',

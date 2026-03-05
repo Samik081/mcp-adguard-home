@@ -107,6 +107,7 @@ export function registerBlockedServicesTools(
     server,
     {
       name: 'blocked_services_get_all',
+      title: 'List All Blockable Services',
       description:
         'List all available services that can be blocked, organized by group',
       category: 'blocked_services',
@@ -127,6 +128,7 @@ export function registerBlockedServicesTools(
     server,
     {
       name: 'blocked_services_get',
+      title: 'Get Blocked Services',
       description:
         'Retrieve currently blocked services list and schedule',
       category: 'blocked_services',
@@ -149,6 +151,7 @@ export function registerBlockedServicesTools(
     server,
     {
       name: 'blocked_services_update',
+      title: 'Update Blocked Services',
       description:
         'Update the list of blocked services and optional schedule',
       category: 'blocked_services',
