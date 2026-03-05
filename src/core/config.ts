@@ -71,10 +71,6 @@ export function loadConfig(): AppConfig {
   // Parse debug flag
   const debug = Boolean(process.env.DEBUG);
 
-  // Parse destructive confirmation flag
-  const confirmDestructive =
-    process.env.ADGUARD_CONFIRM_DESTRUCTIVE?.toLowerCase() === 'true';
-
   const transport =
     process.env.MCP_TRANSPORT === 'http' ? ('http' as const) : ('stdio' as const);
   const rawPort = process.env.MCP_PORT ?? '3000';
@@ -93,7 +89,6 @@ export function loadConfig(): AppConfig {
     accessTier,
     categories,
     debug,
-    confirmDestructive,
     transport,
     httpPort,
     httpHost,

@@ -13,7 +13,6 @@ export function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     accessTier: 'full',
     categories: null,
     debug: false,
-    confirmDestructive: false,
     transport: 'stdio',
     httpPort: 3000,
     httpHost: '0.0.0.0',

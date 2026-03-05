@@ -385,20 +385,12 @@ export function registerDhcpTools(
     {
       name: 'dhcp_reset',
       description:
-        'Reset DHCP configuration to defaults (destructive -- may require confirmation)',
+        'Reset DHCP configuration to defaults. This is a destructive operation that cannot be undone.',
       category: 'dhcp',
       accessTier: 'full',
       annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
-      inputSchema: {
-        confirm: z
-          .boolean()
-          .optional()
-          .describe('Set to true to confirm destructive operation'),
-      },
-      handler: async (args) => {
-        if (config.confirmDestructive && !args.confirm) {
-          return 'This is a destructive operation that cannot be undone. Set confirm: true to proceed.';
-        }
+      inputSchema: {},
+      handler: async () => {
         await client.post('dhcp/reset', {});
         return 'DHCP configuration reset to defaults.';
       },
@@ -411,20 +403,12 @@ export function registerDhcpTools(
     {
       name: 'dhcp_reset_leases',
       description:
-        'Clear all DHCP leases (destructive -- may require confirmation)',
+        'Clear all DHCP leases. This is a destructive operation that cannot be undone.',
       category: 'dhcp',
       accessTier: 'full',
       annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
-      inputSchema: {
-        confirm: z
-          .boolean()
-          .optional()
-          .describe('Set to true to confirm destructive operation'),
-      },
-      handler: async (args) => {
-        if (config.confirmDestructive && !args.confirm) {
-          return 'This is a destructive operation that cannot be undone. Set confirm: true to proceed.';
-        }
+      inputSchema: {},
+      handler: async () => {
         await client.post('dhcp/reset_leases', {});
         return 'All DHCP leases cleared.';
       },

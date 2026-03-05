@@ -58,7 +58,6 @@ export interface AppConfig {
   accessTier: AccessTier;
   categories: ToolCategory[] | null;
   debug: boolean;
-  confirmDestructive: boolean;
   transport: 'stdio' | 'http';
   httpPort: number;
   httpHost: string;

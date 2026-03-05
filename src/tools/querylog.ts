@@ -208,16 +208,8 @@ export function registerQuerylogTools(
       category: 'querylog',
       accessTier: 'full',
       annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
-      inputSchema: {
-        confirm: z
-          .boolean()
-          .optional()
-          .describe('Set to true to confirm destructive operation'),
-      },
-      handler: async (args) => {
-        if (config.confirmDestructive && !args.confirm) {
-          return 'This is a destructive operation that cannot be undone. Set confirm: true to proceed.';
-        }
+      inputSchema: {},
+      handler: async () => {
         await client.post('querylog_clear');
         return 'Query log cleared.';
       },
