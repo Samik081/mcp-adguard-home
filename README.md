@@ -14,7 +14,6 @@ MCP server for [AdGuard Home](https://adguard.com/pl/adguard-home/overview.html)
 - **65 tools** across **16 API categories** covering the complete AdGuard Home API
 - **Read-only mode** via `ADGUARD_ACCESS_TIER=read-only` for safe monitoring
 - **Category filtering** via `ADGUARD_CATEGORIES` to expose only the tools you need
-- **Destructive operation guard** with optional confirmation for reset/delete operations
 - **Zero HTTP dependencies** -- uses native `fetch` (Node.js 18+)
 - **Docker images** for `linux/amd64` and `linux/arm64` on [GHCR](https://ghcr.io/samik081/mcp-adguard-home)
 - **Remote MCP** via HTTP transport (`MCP_TRANSPORT=http`) using the Streamable HTTP protocol
@@ -153,7 +152,6 @@ Tools that are not available in your tier are not registered with the MCP server
 | `ADGUARD_PASSWORD` | Yes | -- | Admin password |
 | `ADGUARD_ACCESS_TIER` | No | `full` | `read-only` for read-only tools only, `full` for all tools |
 | `ADGUARD_CATEGORIES` | No | *(all)* | Comma-separated category allowlist (e.g., `dns,filtering,stats`) |
-| `ADGUARD_CONFIRM_DESTRUCTIVE` | No | `false` | Require `confirm: true` parameter for destructive operations |
 | `DEBUG` | No | `false` | Enable debug logging to stderr |
 | `MCP_TRANSPORT` | No | `stdio` | Transport mode: `stdio` (default) or `http` |
 | `MCP_PORT` | No | `3000` | HTTP server port (only used when `MCP_TRANSPORT=http`) |
