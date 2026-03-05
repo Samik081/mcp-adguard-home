@@ -93,6 +93,7 @@ export function registerGlobalTools(
     server,
     {
       name: 'global_get_status',
+      title: 'Get Server Status',
       description:
         'Retrieve AdGuard Home server status including version, DNS addresses, protection state, and ports',
       category: 'global',
@@ -111,6 +112,7 @@ export function registerGlobalTools(
     server,
     {
       name: 'global_get_profile',
+      title: 'Get User Profile',
       description: 'Retrieve user profile (name, language, theme)',
       category: 'global',
       accessTier: 'read-only',
@@ -128,6 +130,7 @@ export function registerGlobalTools(
     server,
     {
       name: 'global_check_version',
+      title: 'Check for Updates',
       description:
         'Check for AdGuard Home updates and compare with current version',
       category: 'global',
@@ -156,6 +159,7 @@ export function registerGlobalTools(
     server,
     {
       name: 'global_set_protection',
+      title: 'Set DNS Protection',
       description:
         'Enable or disable DNS protection globally, with optional duration for temporary disable',
       category: 'global',
@@ -196,6 +200,7 @@ export function registerGlobalTools(
     server,
     {
       name: 'global_update_profile',
+      title: 'Update User Profile',
       description:
         'Update user profile settings (name, language, theme). All fields are optional -- only provided fields are updated.',
       category: 'global',
@@ -225,6 +230,7 @@ export function registerGlobalTools(
     server,
     {
       name: 'global_begin_update',
+      title: 'Begin Software Update',
       description:
         'Initiate an AdGuard Home software update. The server may restart after this operation.',
       category: 'global',

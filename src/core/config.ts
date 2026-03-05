@@ -68,6 +68,9 @@ export function loadConfig(): AppConfig {
     categories = parsed as ToolCategory[];
   }
 
+  // Parse tool titles exclusion flag
+  const excludeToolTitles = process.env.MCP_EXCLUDE_TOOL_TITLES === 'true';
+
   // Parse debug flag
   const debug = Boolean(process.env.DEBUG);
 
@@ -88,6 +91,7 @@ export function loadConfig(): AppConfig {
     password: password!,
     accessTier,
     categories,
+    excludeToolTitles,
     debug,
     transport,
     httpPort,

@@ -127,6 +127,7 @@ export function registerClientsTools(
     server,
     {
       name: 'clients_get',
+      title: 'Get Clients',
       description:
         'Retrieve all configured and auto-detected clients with their settings',
       category: 'clients',
@@ -145,6 +146,7 @@ export function registerClientsTools(
     server,
     {
       name: 'clients_search',
+      title: 'Search Clients',
       description:
         'Search for specific clients by their IDs (IP, MAC, CIDR, or client ID)',
       category: 'clients',
@@ -184,6 +186,7 @@ export function registerClientsTools(
     server,
     {
       name: 'clients_add',
+      title: 'Add Client',
       description:
         'Add a new persistent client with per-client settings',
       category: 'clients',
@@ -253,6 +256,7 @@ export function registerClientsTools(
     server,
     {
       name: 'clients_update',
+      title: 'Update Client',
       description:
         'Update an existing persistent client by name',
       category: 'clients',
@@ -296,6 +300,7 @@ export function registerClientsTools(
     server,
     {
       name: 'clients_delete',
+      title: 'Delete Client',
       description:
         'Delete a persistent client by name',
       category: 'clients',

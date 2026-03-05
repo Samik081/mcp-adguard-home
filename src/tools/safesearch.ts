@@ -60,6 +60,7 @@ export function registerSafesearchTools(
     server,
     {
       name: 'safesearch_get_status',
+      title: 'Get Safe Search Status',
       description:
         'Retrieve safe search settings showing per-engine enforcement status',
       category: 'safesearch',
@@ -82,6 +83,7 @@ export function registerSafesearchTools(
     server,
     {
       name: 'safesearch_set_settings',
+      title: 'Set Safe Search Settings',
       description:
         'Update safe search settings. Set global enabled state and optionally configure per-engine enforcement.',
       category: 'safesearch',

@@ -45,6 +45,7 @@ export function registerRewritesTools(
     server,
     {
       name: 'rewrites_list',
+      title: 'List DNS Rewrites',
       description: 'Retrieve all configured DNS rewrite rules',
       category: 'rewrites',
       accessTier: 'read-only',
@@ -62,6 +63,7 @@ export function registerRewritesTools(
     server,
     {
       name: 'rewrites_get_settings',
+      title: 'Get Rewrite Settings',
       description: 'Retrieve DNS rewrite module enabled/disabled state',
       category: 'rewrites',
       accessTier: 'read-only',
@@ -83,6 +85,7 @@ export function registerRewritesTools(
     server,
     {
       name: 'rewrites_add',
+      title: 'Add DNS Rewrite',
       description: 'Add a new DNS rewrite rule',
       category: 'rewrites',
       accessTier: 'full',
@@ -105,6 +108,7 @@ export function registerRewritesTools(
     server,
     {
       name: 'rewrites_update',
+      title: 'Update DNS Rewrite',
       description:
         'Update a DNS rewrite rule (removes existing rule and adds updated one)',
       category: 'rewrites',
@@ -144,6 +148,7 @@ export function registerRewritesTools(
     server,
     {
       name: 'rewrites_delete',
+      title: 'Delete DNS Rewrite',
       description:
         'Delete a DNS rewrite rule (both domain and answer must match)',
       category: 'rewrites',
@@ -167,6 +172,7 @@ export function registerRewritesTools(
     server,
     {
       name: 'rewrites_set_settings',
+      title: 'Set Rewrite Settings',
       description: 'Enable or disable the DNS rewrite module',
       category: 'rewrites',
       accessTier: 'full',

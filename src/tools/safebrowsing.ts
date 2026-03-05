@@ -19,6 +19,7 @@ export function registerSafebrowsingTools(
     server,
     {
       name: 'safebrowsing_get_status',
+      title: 'Get Safe Browsing Status',
       description:
         'Retrieve safe browsing (malware/phishing protection) status',
       category: 'safebrowsing',
@@ -41,6 +42,7 @@ export function registerSafebrowsingTools(
     server,
     {
       name: 'safebrowsing_set',
+      title: 'Set Safe Browsing',
       description:
         'Enable or disable safe browsing (malware/phishing protection)',
       category: 'safebrowsing',

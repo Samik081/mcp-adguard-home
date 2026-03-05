@@ -21,6 +21,7 @@ export function registerParentalTools(
     server,
     {
       name: 'parental_get_status',
+      title: 'Get Parental Filtering Status',
       description: 'Retrieve parental filtering status',
       category: 'parental',
       accessTier: 'read-only',
@@ -43,6 +44,7 @@ export function registerParentalTools(
     server,
     {
       name: 'parental_set',
+      title: 'Set Parental Filtering',
       description: 'Enable or disable parental filtering (content restrictions)',
       category: 'parental',
       accessTier: 'full',

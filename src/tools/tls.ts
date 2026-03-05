@@ -102,6 +102,7 @@ export function registerTlsTools(
     server,
     {
       name: 'tls_get_status',
+      title: 'Get TLS Status',
       description:
         'Retrieve TLS configuration and certificate validation status',
       category: 'tls',
@@ -120,6 +121,7 @@ export function registerTlsTools(
     server,
     {
       name: 'tls_validate',
+      title: 'Validate TLS Configuration',
       description:
         'Validate TLS configuration without applying changes. Tests certificate and key validity.',
       category: 'tls',
@@ -180,6 +182,7 @@ export function registerTlsTools(
     server,
     {
       name: 'tls_set_config',
+      title: 'Set TLS Configuration',
       description:
         'Update TLS configuration including certificates and HTTPS/DoH/DoT settings',
       category: 'tls',

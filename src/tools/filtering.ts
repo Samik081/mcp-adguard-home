@@ -124,6 +124,7 @@ export function registerFilteringTools(
     server,
     {
       name: 'filtering_get_status',
+      title: 'Get Filtering Status',
       description:
         'Retrieve filtering configuration including blocklists, allowlists, user rules, and global enabled state',
       category: 'filtering',
@@ -144,6 +145,7 @@ export function registerFilteringTools(
     server,
     {
       name: 'filtering_check_host',
+      title: 'Check Host Filtering',
       description:
         'Test whether a hostname would be blocked by current filtering rules',
       category: 'filtering',
@@ -174,6 +176,7 @@ export function registerFilteringTools(
     server,
     {
       name: 'filtering_set_config',
+      title: 'Set Filtering Configuration',
       description:
         'Update global filtering configuration (enabled state and update interval). Both fields are required -- this is a full replacement.',
       category: 'filtering',
@@ -198,6 +201,7 @@ export function registerFilteringTools(
     server,
     {
       name: 'filtering_add_url',
+      title: 'Add Filter URL',
       description:
         'Add a new filter URL (blocklist or allowlist)',
       category: 'filtering',
@@ -227,6 +231,7 @@ export function registerFilteringTools(
     server,
     {
       name: 'filtering_remove_url',
+      title: 'Remove Filter URL',
       description: 'Remove a filter URL from blocklist or allowlist',
       category: 'filtering',
       accessTier: 'full',
@@ -252,6 +257,7 @@ export function registerFilteringTools(
     server,
     {
       name: 'filtering_set_url',
+      title: 'Update Filter URL',
       description:
         'Update an existing filter URL (rename, change URL, or enable/disable)',
       category: 'filtering',
@@ -284,6 +290,7 @@ export function registerFilteringTools(
     server,
     {
       name: 'filtering_refresh',
+      title: 'Refresh Filters',
       description: 'Force refresh of filter lists to fetch latest updates',
       category: 'filtering',
       accessTier: 'full',
@@ -311,6 +318,7 @@ export function registerFilteringTools(
     server,
     {
       name: 'filtering_set_rules',
+      title: 'Set Custom Filtering Rules',
       description: 'Set custom filtering rules (replaces all existing custom rules)',
       category: 'filtering',
       accessTier: 'full',
