@@ -3,49 +3,49 @@
  * 'read-only' - only read tools are available
  * 'full' - all tools (read + write) are available
  */
-export type AccessTier = 'read-only' | 'full';
+export type AccessTier = "read-only" | "full";
 
 /**
  * Tool categories matching AdGuard Home API domains.
  */
 export type ToolCategory =
-  | 'global'
-  | 'dns'
-  | 'querylog'
-  | 'stats'
-  | 'filtering'
-  | 'safebrowsing'
-  | 'parental'
-  | 'safesearch'
-  | 'clients'
-  | 'dhcp'
-  | 'rewrites'
-  | 'tls'
-  | 'blocked_services'
-  | 'access'
-  | 'install'
-  | 'mobile_config';
+  | "global"
+  | "dns"
+  | "querylog"
+  | "stats"
+  | "filtering"
+  | "safebrowsing"
+  | "parental"
+  | "safesearch"
+  | "clients"
+  | "dhcp"
+  | "rewrites"
+  | "tls"
+  | "blocked_services"
+  | "access"
+  | "install"
+  | "mobile_config";
 
 /**
  * All valid tool categories for validation.
  */
 export const VALID_CATEGORIES: ToolCategory[] = [
-  'global',
-  'dns',
-  'querylog',
-  'stats',
-  'filtering',
-  'safebrowsing',
-  'parental',
-  'safesearch',
-  'clients',
-  'dhcp',
-  'rewrites',
-  'tls',
-  'blocked_services',
-  'access',
-  'install',
-  'mobile_config',
+  "global",
+  "dns",
+  "querylog",
+  "stats",
+  "filtering",
+  "safebrowsing",
+  "parental",
+  "safesearch",
+  "clients",
+  "dhcp",
+  "rewrites",
+  "tls",
+  "blocked_services",
+  "access",
+  "install",
+  "mobile_config",
 ];
 
 /**
@@ -61,7 +61,7 @@ export interface AppConfig {
   toolWhitelist: string[] | null;
   excludeToolTitles: boolean;
   debug: boolean;
-  transport: 'stdio' | 'http';
+  transport: "stdio" | "http";
   httpPort: number;
   httpHost: string;
 }
@@ -78,7 +78,7 @@ export interface ToolRegistration {
   description: string;
   category: ToolCategory;
   accessTier: AccessTier;
-  annotations?: import('@modelcontextprotocol/sdk/types.js').ToolAnnotations;
+  annotations?: import("@modelcontextprotocol/sdk/types.js").ToolAnnotations;
   inputSchema: Record<string, unknown>;
   handler: (args: Record<string, unknown>) => Promise<string>;
 }

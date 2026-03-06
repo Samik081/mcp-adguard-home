@@ -2,11 +2,11 @@
  * Global tools: server status, user profile, version check.
  */
 
-import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { AppConfig } from '../types/index.js';
-import { AdGuardClient } from '../core/client.js';
-import { registerTool } from '../core/tools.js';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+import type { AdGuardClient } from "../core/client.js";
+import { registerTool } from "../core/tools.js";
+import type { AppConfig } from "../types/index.js";
 
 // --- Local response interfaces ---
 
@@ -38,31 +38,31 @@ interface VersionResponse {
 
 function formatStatus(data: StatusResponse): string {
   const lines: string[] = [
-    'Server Status',
+    "Server Status",
     `  Version: ${data.version}`,
-    `  Running: ${data.running ? 'yes' : 'no'}`,
-    `  Protection: ${data.protection_enabled ? 'enabled' : 'disabled'}`,
-    `  DNS addresses: ${data.dns_addresses.length ? data.dns_addresses.join(', ') : 'none'}`,
+    `  Running: ${data.running ? "yes" : "no"}`,
+    `  Protection: ${data.protection_enabled ? "enabled" : "disabled"}`,
+    `  DNS addresses: ${data.dns_addresses.length ? data.dns_addresses.join(", ") : "none"}`,
     `  DNS port: ${data.dns_port}`,
     `  HTTP port: ${data.http_port}`,
     `  Language: ${data.language}`,
   ];
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 function formatProfile(data: ProfileResponse): string {
   const lines: string[] = [
-    'User Profile',
-    `  Name: ${data.name || '(not set)'}`,
+    "User Profile",
+    `  Name: ${data.name || "(not set)"}`,
     `  Language: ${data.language}`,
     `  Theme: ${data.theme}`,
   ];
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 function formatVersion(data: VersionResponse, currentVersion: string): string {
   const hasUpdate =
-    data.new_version !== '' && data.new_version !== currentVersion;
+    data.new_version !== "" && data.new_version !== currentVersion;
 
   if (!hasUpdate) {
     return `Version: ${currentVersion} (up to date)`;
@@ -71,7 +71,7 @@ function formatVersion(data: VersionResponse, currentVersion: string): string {
   const lines: string[] = [
     `Current version: ${currentVersion}`,
     `New version: ${data.new_version}`,
-    `Auto-update: ${data.can_autoupdate ? 'available' : 'not available'}`,
+    `Auto-update: ${data.can_autoupdate ? "available" : "not available"}`,
   ];
   if (data.announcement) {
     lines.push(`Announcement: ${data.announcement}`);
@@ -79,7 +79,7 @@ function formatVersion(data: VersionResponse, currentVersion: string): string {
   if (data.announcement_url) {
     lines.push(`Details: ${data.announcement_url}`);
   }
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 // --- Registration ---
@@ -92,16 +92,20 @@ export function registerGlobalTools(
   registerTool(
     server,
     {
-      name: 'global_get_status',
-      title: 'Get Server Status',
+      name: "global_get_status",
+      title: "Get Server Status",
       description:
-        'Retrieve AdGuard Home server status including version, DNS addresses, protection state, and ports',
-      category: 'global',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+        "Retrieve AdGuard Home server status including version, DNS addresses, protection state, and ports",
+      category: "global",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {},
       handler: async () => {
-        const data = (await client.get('status')) as StatusResponse;
+        const data = (await client.get("status")) as StatusResponse;
         return formatStatus(data);
       },
     },
@@ -111,15 +115,19 @@ export function registerGlobalTools(
   registerTool(
     server,
     {
-      name: 'global_get_profile',
-      title: 'Get User Profile',
-      description: 'Retrieve user profile (name, language, theme)',
-      category: 'global',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+      name: "global_get_profile",
+      title: "Get User Profile",
+      description: "Retrieve user profile (name, language, theme)",
+      category: "global",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {},
       handler: async () => {
-        const data = (await client.get('profile')) as ProfileResponse;
+        const data = (await client.get("profile")) as ProfileResponse;
         return formatProfile(data);
       },
     },
@@ -129,24 +137,28 @@ export function registerGlobalTools(
   registerTool(
     server,
     {
-      name: 'global_check_version',
-      title: 'Check for Updates',
+      name: "global_check_version",
+      title: "Check for Updates",
       description:
-        'Check for AdGuard Home updates and compare with current version',
-      category: 'global',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+        "Check for AdGuard Home updates and compare with current version",
+      category: "global",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {
         recheck_now: z.boolean().optional(),
       },
       handler: async (args) => {
         const recheck = (args.recheck_now as boolean) ?? false;
-        const versionData = (await client.post('version.json', {
+        const versionData = (await client.post("version.json", {
           recheck_now: recheck,
         })) as VersionResponse;
 
         // Get current version from status to compare
-        const status = (await client.get('status')) as StatusResponse;
+        const status = (await client.get("status")) as StatusResponse;
         return formatVersion(versionData, status.version);
       },
     },
@@ -158,20 +170,26 @@ export function registerGlobalTools(
   registerTool(
     server,
     {
-      name: 'global_set_protection',
-      title: 'Set DNS Protection',
+      name: "global_set_protection",
+      title: "Set DNS Protection",
       description:
-        'Enable or disable DNS protection globally, with optional duration for temporary disable',
-      category: 'global',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+        "Enable or disable DNS protection globally, with optional duration for temporary disable",
+      category: "global",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {
-        enabled: z.boolean().describe('Whether DNS protection should be enabled'),
+        enabled: z
+          .boolean()
+          .describe("Whether DNS protection should be enabled"),
         duration: z
           .number()
           .optional()
           .describe(
-            'Duration in seconds to disable protection (0 = permanent). Only used when enabled is false.',
+            "Duration in seconds to disable protection (0 = permanent). Only used when enabled is false.",
           ),
       },
       handler: async (args) => {
@@ -181,16 +199,16 @@ export function registerGlobalTools(
         if (args.duration !== undefined) {
           body.protection_disabled_duration = args.duration as number;
         }
-        await client.post('dns_config', body);
+        await client.post("dns_config", body);
         const enabled = args.enabled as boolean;
         if (enabled) {
-          return 'DNS protection enabled.';
+          return "DNS protection enabled.";
         }
         const duration = args.duration as number | undefined;
         if (duration && duration > 0) {
           return `DNS protection disabled for ${duration} seconds.`;
         }
-        return 'DNS protection disabled.';
+        return "DNS protection disabled.";
       },
     },
     config,
@@ -199,15 +217,19 @@ export function registerGlobalTools(
   registerTool(
     server,
     {
-      name: 'global_update_profile',
-      title: 'Update User Profile',
+      name: "global_update_profile",
+      title: "Update User Profile",
       description:
-        'Update user profile settings (name, language, theme). All fields are optional -- only provided fields are updated.',
-      category: 'global',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+        "Update user profile settings (name, language, theme). All fields are optional -- only provided fields are updated.",
+      category: "global",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {
-        name: z.string().optional().describe('Display name'),
+        name: z.string().optional().describe("Display name"),
         language: z.string().optional().describe('Language code (e.g. "en")'),
         theme: z
           .string()
@@ -219,8 +241,8 @@ export function registerGlobalTools(
         if (args.name !== undefined) body.name = args.name;
         if (args.language !== undefined) body.language = args.language;
         if (args.theme !== undefined) body.theme = args.theme;
-        await client.post('profile/update', body);
-        return 'Profile updated.';
+        await client.post("profile/update", body);
+        return "Profile updated.";
       },
     },
     config,
@@ -229,17 +251,21 @@ export function registerGlobalTools(
   registerTool(
     server,
     {
-      name: 'global_begin_update',
-      title: 'Begin Software Update',
+      name: "global_begin_update",
+      title: "Begin Software Update",
       description:
-        'Initiate an AdGuard Home software update. The server may restart after this operation.',
-      category: 'global',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
+        "Initiate an AdGuard Home software update. The server may restart after this operation.",
+      category: "global",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+      },
       inputSchema: {},
       handler: async () => {
-        await client.post('update');
-        return 'Update initiated.';
+        await client.post("update");
+        return "Update initiated.";
       },
     },
     config,

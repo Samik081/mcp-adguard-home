@@ -2,11 +2,11 @@
  * Install tools: network interface details for initial setup.
  */
 
-import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { AppConfig } from '../types/index.js';
-import { AdGuardClient } from '../core/client.js';
-import { registerTool } from '../core/tools.js';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+import type { AdGuardClient } from "../core/client.js";
+import { registerTool } from "../core/tools.js";
+import type { AppConfig } from "../types/index.js";
 
 // --- Local response interfaces ---
 
@@ -28,7 +28,7 @@ interface AddressesResponse {
 
 function formatAddresses(data: AddressesResponse): string {
   const lines: string[] = [
-    'Install Addresses',
+    "Install Addresses",
     `  Web port: ${data.web_port}`,
     `  DNS port: ${data.dns_port}`,
   ];
@@ -36,10 +36,10 @@ function formatAddresses(data: AddressesResponse): string {
   const interfaces = data.interfaces || {};
   const ifaceEntries = Object.entries(interfaces);
 
-  lines.push('');
+  lines.push("");
   lines.push(`Network Interfaces (${ifaceEntries.length})`);
   if (ifaceEntries.length === 0) {
-    lines.push('  No interfaces found.');
+    lines.push("  No interfaces found.");
   } else {
     for (const [name, iface] of ifaceEntries) {
       lines.push(`  ${name}`);
@@ -50,7 +50,7 @@ function formatAddresses(data: AddressesResponse): string {
         lines.push(`    Hardware address: ${iface.hardware_address}`);
       }
       if (iface.ip_addresses?.length) {
-        lines.push(`    IP addresses: ${iface.ip_addresses.join(', ')}`);
+        lines.push(`    IP addresses: ${iface.ip_addresses.join(", ")}`);
       }
       if (iface.flags) {
         lines.push(`    Flags: ${iface.flags}`);
@@ -58,7 +58,7 @@ function formatAddresses(data: AddressesResponse): string {
     }
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 // --- Registration ---
@@ -71,17 +71,21 @@ export function registerInstallTools(
   registerTool(
     server,
     {
-      name: 'install_get_addresses',
-      title: 'Get Install Addresses',
+      name: "install_get_addresses",
+      title: "Get Install Addresses",
       description:
-        'Retrieve network interface details and ports for initial setup',
-      category: 'install',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+        "Retrieve network interface details and ports for initial setup",
+      category: "install",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get(
-          'install/get_addresses',
+          "install/get_addresses",
         )) as AddressesResponse;
         return formatAddresses(data);
       },
@@ -92,28 +96,36 @@ export function registerInstallTools(
   // --- Write tools ---
 
   const installConfigSchema = {
-    web: z.object({
-      ip: z.string().describe('Web interface bind IP address'),
-      port: z.number().describe('Web interface port'),
-    }).describe('Web interface configuration'),
-    dns: z.object({
-      ip: z.string().describe('DNS server bind IP address'),
-      port: z.number().describe('DNS server port'),
-    }).describe('DNS server configuration'),
-    username: z.string().describe('Admin username'),
-    password: z.string().describe('Admin password'),
+    web: z
+      .object({
+        ip: z.string().describe("Web interface bind IP address"),
+        port: z.number().describe("Web interface port"),
+      })
+      .describe("Web interface configuration"),
+    dns: z
+      .object({
+        ip: z.string().describe("DNS server bind IP address"),
+        port: z.number().describe("DNS server port"),
+      })
+      .describe("DNS server configuration"),
+    username: z.string().describe("Admin username"),
+    password: z.string().describe("Admin password"),
   };
 
   registerTool(
     server,
     {
-      name: 'install_check_config',
-      title: 'Check Install Configuration',
+      name: "install_check_config",
+      title: "Check Install Configuration",
       description:
-        'Validate install configuration without applying (checks web/DNS binding, credentials)',
-      category: 'install',
-      accessTier: 'full',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+        "Validate install configuration without applying (checks web/DNS binding, credentials)",
+      category: "install",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: installConfigSchema,
       handler: async (args) => {
         const body = {
@@ -122,12 +134,15 @@ export function registerInstallTools(
           username: args.username,
           password: args.password,
         };
-        const result = (await client.post('install/check_config', body)) as Record<string, unknown>;
+        const result = (await client.post(
+          "install/check_config",
+          body,
+        )) as Record<string, unknown>;
         const web = result.web as Record<string, unknown> | undefined;
         const dns = result.dns as Record<string, unknown> | undefined;
 
-        const webStatus = web?.status ?? 'unknown';
-        const dnsStatus = dns?.status ?? 'unknown';
+        const webStatus = web?.status ?? "unknown";
+        const dnsStatus = dns?.status ?? "unknown";
         const webPort = (args.web as Record<string, unknown>).port;
         const dnsPort = (args.dns as Record<string, unknown>).port;
         const webIp = (args.web as Record<string, unknown>).ip;
@@ -142,13 +157,17 @@ export function registerInstallTools(
   registerTool(
     server,
     {
-      name: 'install_apply_config',
-      title: 'Apply Install Configuration',
+      name: "install_apply_config",
+      title: "Apply Install Configuration",
       description:
-        'Apply initial setup configuration (web/DNS binding and admin credentials)',
-      category: 'install',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
+        "Apply initial setup configuration (web/DNS binding and admin credentials)",
+      category: "install",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+      },
       inputSchema: installConfigSchema,
       handler: async (args) => {
         const body = {
@@ -157,8 +176,8 @@ export function registerInstallTools(
           username: args.username,
           password: args.password,
         };
-        await client.post('install/configure', body);
-        return 'Install configuration applied.';
+        await client.post("install/configure", body);
+        return "Install configuration applied.";
       },
     },
     config,

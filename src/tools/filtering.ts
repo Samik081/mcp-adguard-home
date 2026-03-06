@@ -2,11 +2,11 @@
  * Filtering tools: filter lists, user rules, and host checking.
  */
 
-import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { AppConfig } from '../types/index.js';
-import { AdGuardClient } from '../core/client.js';
-import { registerTool } from '../core/tools.js';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+import type { AdGuardClient } from "../core/client.js";
+import { registerTool } from "../core/tools.js";
+import type { AppConfig } from "../types/index.js";
 
 // --- Local response interfaces ---
 
@@ -46,16 +46,16 @@ function formatFilterList(filters: FilterEntry[], label: string): string[] {
   const lines: string[] = [];
   if (!filters || filters.length === 0) {
     lines.push(`${label} (0)`);
-    lines.push('  No filters configured.');
+    lines.push("  No filters configured.");
     return lines;
   }
 
   lines.push(`${label} (${filters.length})`);
   for (const f of filters) {
-    const status = f.enabled ? 'enabled' : 'disabled';
+    const status = f.enabled ? "enabled" : "disabled";
     const updated = f.last_updated
-      ? f.last_updated.replace('T', ' ').substring(0, 19)
-      : 'never updated';
+      ? f.last_updated.replace("T", " ").substring(0, 19)
+      : "never updated";
     lines.push(
       `  [${status}] ${f.name} -- ${f.rules_count} rules -- ${updated}`,
     );
@@ -65,24 +65,24 @@ function formatFilterList(filters: FilterEntry[], label: string): string[] {
 
 function formatFilteringStatus(data: FilteringStatus): string {
   const lines: string[] = [
-    'Filtering Status',
-    `  Global filtering: ${data.enabled ? 'enabled' : 'disabled'}`,
+    "Filtering Status",
+    `  Global filtering: ${data.enabled ? "enabled" : "disabled"}`,
     `  Update interval: ${data.interval}h`,
-    '',
+    "",
   ];
 
-  lines.push(...formatFilterList(data.filters, 'Blocklists'));
-  lines.push('');
-  lines.push(...formatFilterList(data.whitelist_filters, 'Allowlists'));
+  lines.push(...formatFilterList(data.filters, "Blocklists"));
+  lines.push("");
+  lines.push(...formatFilterList(data.whitelist_filters, "Allowlists"));
 
   // User rules
-  lines.push('');
+  lines.push("");
   const rules = data.user_rules || [];
   // Filter out empty strings that can appear in the rules array
-  const nonEmpty = rules.filter((r) => r.trim() !== '');
+  const nonEmpty = rules.filter((r) => r.trim() !== "");
   if (nonEmpty.length === 0) {
-    lines.push('User Rules (0)');
-    lines.push('  No user rules configured.');
+    lines.push("User Rules (0)");
+    lines.push("  No user rules configured.");
   } else {
     lines.push(`User Rules (${nonEmpty.length})`);
     const show = nonEmpty.slice(0, 10);
@@ -94,7 +94,7 @@ function formatFilteringStatus(data: FilteringStatus): string {
     }
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 function formatCheckHost(data: CheckHostResponse): string {
@@ -108,9 +108,9 @@ function formatCheckHost(data: CheckHostResponse): string {
 
   if (data.service_name) lines.push(`Service: ${data.service_name}`);
   if (data.cname) lines.push(`CNAME: ${data.cname}`);
-  if (data.ip_addrs?.length) lines.push(`IPs: ${data.ip_addrs.join(', ')}`);
+  if (data.ip_addrs?.length) lines.push(`IPs: ${data.ip_addrs.join(", ")}`);
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 // --- Registration ---
@@ -123,18 +123,20 @@ export function registerFilteringTools(
   registerTool(
     server,
     {
-      name: 'filtering_get_status',
-      title: 'Get Filtering Status',
+      name: "filtering_get_status",
+      title: "Get Filtering Status",
       description:
-        'Retrieve filtering configuration including blocklists, allowlists, user rules, and global enabled state',
-      category: 'filtering',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+        "Retrieve filtering configuration including blocklists, allowlists, user rules, and global enabled state",
+      category: "filtering",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {},
       handler: async () => {
-        const data = (await client.get(
-          'filtering/status',
-        )) as FilteringStatus;
+        const data = (await client.get("filtering/status")) as FilteringStatus;
         return formatFilteringStatus(data);
       },
     },
@@ -144,13 +146,17 @@ export function registerFilteringTools(
   registerTool(
     server,
     {
-      name: 'filtering_check_host',
-      title: 'Check Host Filtering',
+      name: "filtering_check_host",
+      title: "Check Host Filtering",
       description:
-        'Test whether a hostname would be blocked by current filtering rules',
-      category: 'filtering',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+        "Test whether a hostname would be blocked by current filtering rules",
+      category: "filtering",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {
         name: z.string(),
         client: z.string().optional(),
@@ -158,8 +164,8 @@ export function registerFilteringTools(
       },
       handler: async (args) => {
         const params = new URLSearchParams({ name: args.name as string });
-        if (args.client) params.set('client', args.client as string);
-        if (args.qtype) params.set('qtype', args.qtype as string);
+        if (args.client) params.set("client", args.client as string);
+        if (args.qtype) params.set("qtype", args.qtype as string);
 
         const data = (await client.get(
           `filtering/check_host?${params}`,
@@ -175,23 +181,27 @@ export function registerFilteringTools(
   registerTool(
     server,
     {
-      name: 'filtering_set_config',
-      title: 'Set Filtering Configuration',
+      name: "filtering_set_config",
+      title: "Set Filtering Configuration",
       description:
-        'Update global filtering configuration (enabled state and update interval). Both fields are required -- this is a full replacement.',
-      category: 'filtering',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+        "Update global filtering configuration (enabled state and update interval). Both fields are required -- this is a full replacement.",
+      category: "filtering",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {
-        enabled: z.boolean().describe('Whether filtering is globally enabled'),
-        interval: z.number().describe('Filter update interval in hours'),
+        enabled: z.boolean().describe("Whether filtering is globally enabled"),
+        interval: z.number().describe("Filter update interval in hours"),
       },
       handler: async (args) => {
-        await client.post('filtering/config', {
+        await client.post("filtering/config", {
           enabled: args.enabled,
           interval: args.interval,
         });
-        return 'Filtering configuration updated.';
+        return "Filtering configuration updated.";
       },
     },
     config,
@@ -200,23 +210,28 @@ export function registerFilteringTools(
   registerTool(
     server,
     {
-      name: 'filtering_add_url',
-      title: 'Add Filter URL',
-      description:
-        'Add a new filter URL (blocklist or allowlist)',
-      category: 'filtering',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
+      name: "filtering_add_url",
+      title: "Add Filter URL",
+      description: "Add a new filter URL (blocklist or allowlist)",
+      category: "filtering",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+      },
       inputSchema: {
-        name: z.string().describe('Display name for the filter'),
-        url: z.string().describe('URL of the filter list'),
+        name: z.string().describe("Display name for the filter"),
+        url: z.string().describe("URL of the filter list"),
         whitelist: z
           .boolean()
           .optional()
-          .describe('If true, add as allowlist; if false (default), add as blocklist'),
+          .describe(
+            "If true, add as allowlist; if false (default), add as blocklist",
+          ),
       },
       handler: async (args) => {
-        await client.post('filtering/add_url', {
+        await client.post("filtering/add_url", {
           name: args.name,
           url: args.url,
           whitelist: (args.whitelist as boolean) ?? false,
@@ -230,24 +245,30 @@ export function registerFilteringTools(
   registerTool(
     server,
     {
-      name: 'filtering_remove_url',
-      title: 'Remove Filter URL',
-      description: 'Remove a filter URL from blocklist or allowlist',
-      category: 'filtering',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
+      name: "filtering_remove_url",
+      title: "Remove Filter URL",
+      description: "Remove a filter URL from blocklist or allowlist",
+      category: "filtering",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+      },
       inputSchema: {
-        url: z.string().describe('URL of the filter to remove'),
+        url: z.string().describe("URL of the filter to remove"),
         whitelist: z
           .boolean()
-          .describe('Whether the filter is in the allowlist (true) or blocklist (false)'),
+          .describe(
+            "Whether the filter is in the allowlist (true) or blocklist (false)",
+          ),
       },
       handler: async (args) => {
-        await client.post('filtering/remove_url', {
+        await client.post("filtering/remove_url", {
           url: args.url,
           whitelist: args.whitelist,
         });
-        return 'Filter removed.';
+        return "Filter removed.";
       },
     },
     config,
@@ -256,31 +277,41 @@ export function registerFilteringTools(
   registerTool(
     server,
     {
-      name: 'filtering_set_url',
-      title: 'Update Filter URL',
+      name: "filtering_set_url",
+      title: "Update Filter URL",
       description:
-        'Update an existing filter URL (rename, change URL, or enable/disable)',
-      category: 'filtering',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+        "Update an existing filter URL (rename, change URL, or enable/disable)",
+      category: "filtering",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {
-        url: z.string().describe('Current URL of the filter to update'),
+        url: z.string().describe("Current URL of the filter to update"),
         whitelist: z
           .boolean()
-          .describe('Whether the filter is in the allowlist (true) or blocklist (false)'),
-        data: z.object({
-          name: z.string().describe('New display name'),
-          url: z.string().describe('New URL'),
-          enabled: z.boolean().describe('Whether the filter should be enabled'),
-        }).describe('New filter data'),
+          .describe(
+            "Whether the filter is in the allowlist (true) or blocklist (false)",
+          ),
+        data: z
+          .object({
+            name: z.string().describe("New display name"),
+            url: z.string().describe("New URL"),
+            enabled: z
+              .boolean()
+              .describe("Whether the filter should be enabled"),
+          })
+          .describe("New filter data"),
       },
       handler: async (args) => {
-        await client.post('filtering/set_url', {
+        await client.post("filtering/set_url", {
           url: args.url,
           whitelist: args.whitelist,
           data: args.data,
         });
-        return 'Filter updated.';
+        return "Filter updated.";
       },
     },
     config,
@@ -289,26 +320,36 @@ export function registerFilteringTools(
   registerTool(
     server,
     {
-      name: 'filtering_refresh',
-      title: 'Refresh Filters',
-      description: 'Force refresh of filter lists to fetch latest updates',
-      category: 'filtering',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+      name: "filtering_refresh",
+      title: "Refresh Filters",
+      description: "Force refresh of filter lists to fetch latest updates",
+      category: "filtering",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {
         whitelist: z
           .boolean()
           .optional()
-          .describe('If true, refresh allowlists; if false (default), refresh blocklists'),
+          .describe(
+            "If true, refresh allowlists; if false (default), refresh blocklists",
+          ),
       },
       handler: async (args) => {
-        const response = (await client.post('filtering/refresh', {
+        const response = (await client.post("filtering/refresh", {
           whitelist: (args.whitelist as boolean) ?? false,
         })) as { updated: number } | string;
-        if (typeof response === 'object' && response !== null && 'updated' in response) {
+        if (
+          typeof response === "object" &&
+          response !== null &&
+          "updated" in response
+        ) {
           return `Filters refreshed. Updated: ${response.updated}`;
         }
-        return 'Filters refreshed.';
+        return "Filters refreshed.";
       },
     },
     config,
@@ -317,20 +358,23 @@ export function registerFilteringTools(
   registerTool(
     server,
     {
-      name: 'filtering_set_rules',
-      title: 'Set Custom Filtering Rules',
-      description: 'Set custom filtering rules (replaces all existing custom rules)',
-      category: 'filtering',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+      name: "filtering_set_rules",
+      title: "Set Custom Filtering Rules",
+      description:
+        "Set custom filtering rules (replaces all existing custom rules)",
+      category: "filtering",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {
-        rules: z
-          .array(z.string())
-          .describe('Array of custom filtering rules'),
+        rules: z.array(z.string()).describe("Array of custom filtering rules"),
       },
       handler: async (args) => {
         const rules = args.rules as string[];
-        await client.post('filtering/set_rules', { rules });
+        await client.post("filtering/set_rules", { rules });
         return `Custom rules updated (${rules.length} rules).`;
       },
     },

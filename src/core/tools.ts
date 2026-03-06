@@ -4,11 +4,11 @@
  * and error handling.
  */
 
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js';
-import type { AppConfig, ToolRegistration } from '../types/index.js';
-import { sanitizeMessage } from './errors.js';
-import { logger } from './logger.js';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
+import type { AppConfig, ToolRegistration } from "../types/index.js";
+import { sanitizeMessage } from "./errors.js";
+import { logger } from "./logger.js";
 
 /** Tracks all tool names seen during registration for post-registration validation. */
 const seenToolNames = new Set<string>();
@@ -32,10 +32,8 @@ export function registerTool(
 ): boolean {
   seenToolNames.add(registration.name);
 
-  const isBlacklisted =
-    config.toolBlacklist !== null && config.toolBlacklist.includes(registration.name);
-  const isWhitelisted =
-    config.toolWhitelist !== null && config.toolWhitelist.includes(registration.name);
+  const isBlacklisted = config.toolBlacklist?.includes(registration.name);
+  const isWhitelisted = config.toolWhitelist?.includes(registration.name);
 
   // Blacklist always wins
   if (isBlacklisted) {
@@ -52,7 +50,10 @@ export function registerTool(
   // Whitelist bypasses tier and category filters
   if (!isWhitelisted) {
     // Check access tier: skip write-only tools in read-only mode
-    if (config.accessTier === 'read-only' && registration.accessTier === 'full') {
+    if (
+      config.accessTier === "read-only" &&
+      registration.accessTier === "full"
+    ) {
       logger.debug(
         `Skipping tool "${registration.name}" (requires full access, running in read-only mode)`,
       );
@@ -73,7 +74,7 @@ export function registerTool(
 
   // Build annotations
   const annotations: ToolAnnotations = {
-    readOnlyHint: registration.accessTier === 'read-only',
+    readOnlyHint: registration.accessTier === "read-only",
     destructiveHint: false,
     ...registration.annotations,
   };
@@ -91,15 +92,15 @@ export function registerTool(
       try {
         const result = await registration.handler(args);
         return {
-          content: [{ type: 'text' as const, text: result }],
+          content: [{ type: "text" as const, text: result }],
         };
       } catch (err) {
         const message =
           err instanceof Error
             ? sanitizeMessage(err.message, config)
-            : 'An unknown error occurred';
+            : "An unknown error occurred";
         return {
-          content: [{ type: 'text' as const, text: message }],
+          content: [{ type: "text" as const, text: message }],
           isError: true,
         };
       }
@@ -107,9 +108,13 @@ export function registerTool(
   );
 
   if (isWhitelisted) {
-    logger.debug(`Registered tool: ${registration.name} [${registration.category}] (whitelisted)`);
+    logger.debug(
+      `Registered tool: ${registration.name} [${registration.category}] (whitelisted)`,
+    );
   } else {
-    logger.debug(`Registered tool: ${registration.name} [${registration.category}]`);
+    logger.debug(
+      `Registered tool: ${registration.name} [${registration.category}]`,
+    );
   }
   return true;
 }

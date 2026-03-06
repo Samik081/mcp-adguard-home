@@ -7,6 +7,6 @@
  * Returns the full header value: "Basic <base64>"
  */
 export function createAuthHeader(username: string, password: string): string {
-  const encoded = Buffer.from(`${username}:${password}`).toString('base64');
+  const encoded = Buffer.from(`${username}:${password}`).toString("base64");
   return `Basic ${encoded}`;
 }

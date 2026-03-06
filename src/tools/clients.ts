@@ -2,11 +2,11 @@
  * Client tools: configured and auto-detected client listing and search.
  */
 
-import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { AppConfig } from '../types/index.js';
-import { AdGuardClient } from '../core/client.js';
-import { registerTool } from '../core/tools.js';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+import type { AdGuardClient } from "../core/client.js";
+import { registerTool } from "../core/tools.js";
+import type { AppConfig } from "../types/index.js";
 
 // --- Local response interfaces ---
 
@@ -54,14 +54,14 @@ interface ClientSearchResult {
 function formatConfiguredClient(c: ConfiguredClient): string {
   const lines: string[] = [
     `  ${c.name}`,
-    `    IDs: ${c.ids.join(', ')}`,
-    `    Global settings: ${c.use_global_settings ? 'yes' : 'no'}`,
-    `    Filtering: ${c.filtering_enabled ? 'on' : 'off'}`,
-    `    Safe browsing: ${c.safebrowsing_enabled ? 'on' : 'off'}`,
-    `    Parental: ${c.parental_enabled ? 'on' : 'off'}`,
+    `    IDs: ${c.ids.join(", ")}`,
+    `    Global settings: ${c.use_global_settings ? "yes" : "no"}`,
+    `    Filtering: ${c.filtering_enabled ? "on" : "off"}`,
+    `    Safe browsing: ${c.safebrowsing_enabled ? "on" : "off"}`,
+    `    Parental: ${c.parental_enabled ? "on" : "off"}`,
     `    Blocked services: ${c.blocked_services.length}`,
   ];
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 function formatAutoClient(c: AutoClient): string {
@@ -72,10 +72,10 @@ function formatAutoClient(c: AutoClient): string {
   if (c.whois_info && Object.keys(c.whois_info).length > 0) {
     const whoisParts = Object.entries(c.whois_info)
       .map(([k, v]) => `${k}: ${v}`)
-      .join(', ');
+      .join(", ");
     lines.push(`    WHOIS: ${whoisParts}`);
   }
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 function formatClients(data: ClientsResponse): string {
@@ -83,37 +83,37 @@ function formatClients(data: ClientsResponse): string {
 
   sections.push(`Configured Clients (${data.clients.length})`);
   if (data.clients.length === 0) {
-    sections.push('  No configured clients.');
+    sections.push("  No configured clients.");
   } else {
     for (const c of data.clients) {
       sections.push(formatConfiguredClient(c));
     }
   }
 
-  sections.push('');
+  sections.push("");
   sections.push(`Auto-Detected Clients (${data.auto_clients.length})`);
   if (data.auto_clients.length === 0) {
-    sections.push('  No auto-detected clients.');
+    sections.push("  No auto-detected clients.");
   } else {
     for (const c of data.auto_clients) {
       sections.push(formatAutoClient(c));
     }
   }
 
-  return sections.join('\n');
+  return sections.join("\n");
 }
 
 function formatSearchResult(result: ClientSearchResult): string {
   const lines: string[] = [
     `  ${result.name}`,
-    `    IDs: ${result.ids.join(', ')}`,
-    `    Global settings: ${result.use_global_settings ? 'yes' : 'no'}`,
-    `    Filtering: ${result.filtering_enabled ? 'on' : 'off'}`,
-    `    Safe browsing: ${result.safebrowsing_enabled ? 'on' : 'off'}`,
-    `    Parental: ${result.parental_enabled ? 'on' : 'off'}`,
+    `    IDs: ${result.ids.join(", ")}`,
+    `    Global settings: ${result.use_global_settings ? "yes" : "no"}`,
+    `    Filtering: ${result.filtering_enabled ? "on" : "off"}`,
+    `    Safe browsing: ${result.safebrowsing_enabled ? "on" : "off"}`,
+    `    Parental: ${result.parental_enabled ? "on" : "off"}`,
     `    Blocked services: ${result.blocked_services?.length ?? 0}`,
   ];
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 // --- Registration ---
@@ -126,16 +126,20 @@ export function registerClientsTools(
   registerTool(
     server,
     {
-      name: 'clients_get',
-      title: 'Get Clients',
+      name: "clients_get",
+      title: "Get Clients",
       description:
-        'Retrieve all configured and auto-detected clients with their settings',
-      category: 'clients',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+        "Retrieve all configured and auto-detected clients with their settings",
+      category: "clients",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {},
       handler: async () => {
-        const data = (await client.get('clients')) as ClientsResponse;
+        const data = (await client.get("clients")) as ClientsResponse;
         return formatClients(data);
       },
     },
@@ -145,36 +149,39 @@ export function registerClientsTools(
   registerTool(
     server,
     {
-      name: 'clients_search',
-      title: 'Search Clients',
+      name: "clients_search",
+      title: "Search Clients",
       description:
-        'Search for specific clients by their IDs (IP, MAC, CIDR, or client ID)',
-      category: 'clients',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+        "Search for specific clients by their IDs (IP, MAC, CIDR, or client ID)",
+      category: "clients",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {
-        ids: z.array(z.string()).describe('Client identifiers to search for'),
+        ids: z.array(z.string()).describe("Client identifiers to search for"),
       },
       handler: async (args) => {
         const ids = args.ids as string[];
         // PITFALL: Use POST to clients/search, not deprecated GET clients/find
-        const results = (await client.post(
-          'clients/search',
-          { clients: ids.map((id) => ({ id })) },
-        )) as ClientSearchResult[][];
+        const results = (await client.post("clients/search", {
+          clients: ids.map((id) => ({ id })),
+        })) as ClientSearchResult[][];
 
         if (!results || results.length === 0) {
-          return 'No clients found.';
+          return "No clients found.";
         }
 
-        const lines: string[] = ['Client Search Results'];
+        const lines: string[] = ["Client Search Results"];
         for (const resultGroup of results) {
           for (const r of resultGroup) {
             lines.push(formatSearchResult(r));
           }
         }
 
-        return lines.join('\n');
+        return lines.join("\n");
       },
     },
     config,
@@ -185,46 +192,46 @@ export function registerClientsTools(
   registerTool(
     server,
     {
-      name: 'clients_add',
-      title: 'Add Client',
-      description:
-        'Add a new persistent client with per-client settings',
-      category: 'clients',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
+      name: "clients_add",
+      title: "Add Client",
+      description: "Add a new persistent client with per-client settings",
+      category: "clients",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+      },
       inputSchema: {
-        name: z.string().describe('Client display name'),
+        name: z.string().describe("Client display name"),
         ids: z
           .array(z.string())
-          .describe('Client identifiers (IPs, CIDRs, MACs, client IDs)'),
+          .describe("Client identifiers (IPs, CIDRs, MACs, client IDs)"),
         use_global_settings: z
           .boolean()
           .optional()
-          .describe('Use global settings for this client'),
+          .describe("Use global settings for this client"),
         filtering_enabled: z
           .boolean()
           .optional()
-          .describe('Enable filtering for this client'),
+          .describe("Enable filtering for this client"),
         safebrowsing_enabled: z
           .boolean()
           .optional()
-          .describe('Enable safe browsing for this client'),
+          .describe("Enable safe browsing for this client"),
         parental_enabled: z
           .boolean()
           .optional()
-          .describe('Enable parental control for this client'),
+          .describe("Enable parental control for this client"),
         use_global_blocked_services: z
           .boolean()
           .optional()
-          .describe('Use global blocked services list'),
+          .describe("Use global blocked services list"),
         blocked_services: z
           .array(z.string())
           .optional()
-          .describe('Per-client blocked service IDs'),
-        tags: z
-          .array(z.string())
-          .optional()
-          .describe('Client tags'),
+          .describe("Per-client blocked service IDs"),
+        tags: z.array(z.string()).optional().describe("Client tags"),
       },
       handler: async (args) => {
         const body: Record<string, unknown> = {
@@ -245,7 +252,7 @@ export function registerClientsTools(
           body.blocked_services = args.blocked_services;
         if (args.tags !== undefined) body.tags = args.tags;
 
-        await client.post('clients/add', body);
+        await client.post("clients/add", body);
         return `Client '${args.name as string}' added.`;
       },
     },
@@ -255,41 +262,55 @@ export function registerClientsTools(
   registerTool(
     server,
     {
-      name: 'clients_update',
-      title: 'Update Client',
-      description:
-        'Update an existing persistent client by name',
-      category: 'clients',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+      name: "clients_update",
+      title: "Update Client",
+      description: "Update an existing persistent client by name",
+      category: "clients",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {
-        name: z.string().describe('Name of the client to update'),
-        data: z.object({
-          name: z.string().describe('New client display name'),
-          ids: z
-            .array(z.string())
-            .describe('Client identifiers (IPs, CIDRs, MACs, client IDs)'),
-          use_global_settings: z.boolean().optional().describe('Use global settings'),
-          filtering_enabled: z.boolean().optional().describe('Enable filtering'),
-          safebrowsing_enabled: z
-            .boolean()
-            .optional()
-            .describe('Enable safe browsing'),
-          parental_enabled: z.boolean().optional().describe('Enable parental control'),
-          use_global_blocked_services: z
-            .boolean()
-            .optional()
-            .describe('Use global blocked services'),
-          blocked_services: z
-            .array(z.string())
-            .optional()
-            .describe('Per-client blocked service IDs'),
-          tags: z.array(z.string()).optional().describe('Client tags'),
-        }).describe('New client data (name and ids required)'),
+        name: z.string().describe("Name of the client to update"),
+        data: z
+          .object({
+            name: z.string().describe("New client display name"),
+            ids: z
+              .array(z.string())
+              .describe("Client identifiers (IPs, CIDRs, MACs, client IDs)"),
+            use_global_settings: z
+              .boolean()
+              .optional()
+              .describe("Use global settings"),
+            filtering_enabled: z
+              .boolean()
+              .optional()
+              .describe("Enable filtering"),
+            safebrowsing_enabled: z
+              .boolean()
+              .optional()
+              .describe("Enable safe browsing"),
+            parental_enabled: z
+              .boolean()
+              .optional()
+              .describe("Enable parental control"),
+            use_global_blocked_services: z
+              .boolean()
+              .optional()
+              .describe("Use global blocked services"),
+            blocked_services: z
+              .array(z.string())
+              .optional()
+              .describe("Per-client blocked service IDs"),
+            tags: z.array(z.string()).optional().describe("Client tags"),
+          })
+          .describe("New client data (name and ids required)"),
       },
       handler: async (args) => {
         const name = args.name as string;
-        await client.post('clients/update', { name, data: args.data });
+        await client.post("clients/update", { name, data: args.data });
         return `Client '${name}' updated.`;
       },
     },
@@ -299,19 +320,22 @@ export function registerClientsTools(
   registerTool(
     server,
     {
-      name: 'clients_delete',
-      title: 'Delete Client',
-      description:
-        'Delete a persistent client by name',
-      category: 'clients',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
+      name: "clients_delete",
+      title: "Delete Client",
+      description: "Delete a persistent client by name",
+      category: "clients",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+      },
       inputSchema: {
-        name: z.string().describe('Name of the client to delete'),
+        name: z.string().describe("Name of the client to delete"),
       },
       handler: async (args) => {
         const name = args.name as string;
-        await client.post('clients/delete', { name });
+        await client.post("clients/delete", { name });
         return `Client '${name}' deleted.`;
       },
     },

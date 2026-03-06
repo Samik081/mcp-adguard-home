@@ -4,11 +4,11 @@
  * PITFALL: icon_svg contains Base64-encoded SVG data that is excluded from output.
  */
 
-import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { AppConfig } from '../types/index.js';
-import { AdGuardClient } from '../core/client.js';
-import { registerTool } from '../core/tools.js';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+import type { AdGuardClient } from "../core/client.js";
+import { registerTool } from "../core/tools.js";
+import type { AppConfig } from "../types/index.js";
 
 // --- Local response interfaces ---
 
@@ -44,18 +44,18 @@ interface BlockedServicesGetResponse {
 
 function formatAllServices(services: BlockedService[]): string {
   if (services.length === 0) {
-    return 'No blocked services available.';
+    return "No blocked services available.";
   }
 
   // Group by group_id
   const groups = new Map<string, { id: string; name: string }[]>();
   for (const s of services) {
-    const group = s.group_id || 'other';
+    const group = s.group_id || "other";
     if (!groups.has(group)) {
       groups.set(group, []);
     }
     // Exclude icon_svg from output
-    groups.get(group)!.push({ id: s.id, name: s.name });
+    groups.get(group)?.push({ id: s.id, name: s.name });
   }
 
   const lines: string[] = [`Available Blocked Services (${services.length})`];
@@ -65,14 +65,14 @@ function formatAllServices(services: BlockedService[]): string {
       lines.push(`    ${item.id} - ${item.name}`);
     }
   }
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 function formatBlockedServices(data: BlockedServicesGetResponse): string {
   const lines: string[] = [];
 
   if (!data.ids || data.ids.length === 0) {
-    lines.push('No services are currently blocked.');
+    lines.push("No services are currently blocked.");
   } else {
     lines.push(`Blocked Services (${data.ids.length})`);
     for (const id of data.ids) {
@@ -81,10 +81,10 @@ function formatBlockedServices(data: BlockedServicesGetResponse): string {
   }
 
   if (data.schedule) {
-    lines.push('');
-    lines.push('Schedule');
-    lines.push(`  Time zone: ${data.schedule.time_zone || '(not set)'}`);
-    const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
+    lines.push("");
+    lines.push("Schedule");
+    lines.push(`  Time zone: ${data.schedule.time_zone || "(not set)"}`);
+    const days = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
     for (const day of days) {
       const d = data.schedule[day];
       if (d) {
@@ -93,7 +93,7 @@ function formatBlockedServices(data: BlockedServicesGetResponse): string {
     }
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 // --- Registration ---
@@ -106,17 +106,21 @@ export function registerBlockedServicesTools(
   registerTool(
     server,
     {
-      name: 'blocked_services_get_all',
-      title: 'List All Blockable Services',
+      name: "blocked_services_get_all",
+      title: "List All Blockable Services",
       description:
-        'List all available services that can be blocked, organized by group',
-      category: 'blocked_services',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+        "List all available services that can be blocked, organized by group",
+      category: "blocked_services",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get(
-          'blocked_services/all',
+          "blocked_services/all",
         )) as BlockedService[];
         return formatAllServices(data);
       },
@@ -127,17 +131,20 @@ export function registerBlockedServicesTools(
   registerTool(
     server,
     {
-      name: 'blocked_services_get',
-      title: 'Get Blocked Services',
-      description:
-        'Retrieve currently blocked services list and schedule',
-      category: 'blocked_services',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+      name: "blocked_services_get",
+      title: "Get Blocked Services",
+      description: "Retrieve currently blocked services list and schedule",
+      category: "blocked_services",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get(
-          'blocked_services/get',
+          "blocked_services/get",
         )) as BlockedServicesGetResponse;
         return formatBlockedServices(data);
       },
@@ -150,79 +157,126 @@ export function registerBlockedServicesTools(
   registerTool(
     server,
     {
-      name: 'blocked_services_update',
-      title: 'Update Blocked Services',
-      description:
-        'Update the list of blocked services and optional schedule',
-      category: 'blocked_services',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+      name: "blocked_services_update",
+      title: "Update Blocked Services",
+      description: "Update the list of blocked services and optional schedule",
+      category: "blocked_services",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {
         ids: z
           .array(z.string())
-          .describe('Service IDs to block (use blocked_services_get_all for available IDs)'),
+          .describe(
+            "Service IDs to block (use blocked_services_get_all for available IDs)",
+          ),
         schedule: z
           .object({
-            time_zone: z.string().optional().describe('IANA time zone name'),
+            time_zone: z.string().optional().describe("IANA time zone name"),
             sun: z
               .object({
-                start: z.number().optional().describe('Start time in ms from midnight'),
-                end: z.number().optional().describe('End time in ms from midnight'),
+                start: z
+                  .number()
+                  .optional()
+                  .describe("Start time in ms from midnight"),
+                end: z
+                  .number()
+                  .optional()
+                  .describe("End time in ms from midnight"),
               })
               .optional()
-              .describe('Sunday schedule'),
+              .describe("Sunday schedule"),
             mon: z
               .object({
-                start: z.number().optional().describe('Start time in ms from midnight'),
-                end: z.number().optional().describe('End time in ms from midnight'),
+                start: z
+                  .number()
+                  .optional()
+                  .describe("Start time in ms from midnight"),
+                end: z
+                  .number()
+                  .optional()
+                  .describe("End time in ms from midnight"),
               })
               .optional()
-              .describe('Monday schedule'),
+              .describe("Monday schedule"),
             tue: z
               .object({
-                start: z.number().optional().describe('Start time in ms from midnight'),
-                end: z.number().optional().describe('End time in ms from midnight'),
+                start: z
+                  .number()
+                  .optional()
+                  .describe("Start time in ms from midnight"),
+                end: z
+                  .number()
+                  .optional()
+                  .describe("End time in ms from midnight"),
               })
               .optional()
-              .describe('Tuesday schedule'),
+              .describe("Tuesday schedule"),
             wed: z
               .object({
-                start: z.number().optional().describe('Start time in ms from midnight'),
-                end: z.number().optional().describe('End time in ms from midnight'),
+                start: z
+                  .number()
+                  .optional()
+                  .describe("Start time in ms from midnight"),
+                end: z
+                  .number()
+                  .optional()
+                  .describe("End time in ms from midnight"),
               })
               .optional()
-              .describe('Wednesday schedule'),
+              .describe("Wednesday schedule"),
             thu: z
               .object({
-                start: z.number().optional().describe('Start time in ms from midnight'),
-                end: z.number().optional().describe('End time in ms from midnight'),
+                start: z
+                  .number()
+                  .optional()
+                  .describe("Start time in ms from midnight"),
+                end: z
+                  .number()
+                  .optional()
+                  .describe("End time in ms from midnight"),
               })
               .optional()
-              .describe('Thursday schedule'),
+              .describe("Thursday schedule"),
             fri: z
               .object({
-                start: z.number().optional().describe('Start time in ms from midnight'),
-                end: z.number().optional().describe('End time in ms from midnight'),
+                start: z
+                  .number()
+                  .optional()
+                  .describe("Start time in ms from midnight"),
+                end: z
+                  .number()
+                  .optional()
+                  .describe("End time in ms from midnight"),
               })
               .optional()
-              .describe('Friday schedule'),
+              .describe("Friday schedule"),
             sat: z
               .object({
-                start: z.number().optional().describe('Start time in ms from midnight'),
-                end: z.number().optional().describe('End time in ms from midnight'),
+                start: z
+                  .number()
+                  .optional()
+                  .describe("Start time in ms from midnight"),
+                end: z
+                  .number()
+                  .optional()
+                  .describe("End time in ms from midnight"),
               })
               .optional()
-              .describe('Saturday schedule'),
+              .describe("Saturday schedule"),
           })
           .optional()
-          .describe('Blocking schedule by day of week'),
+          .describe("Blocking schedule by day of week"),
       },
       handler: async (args) => {
         const ids = args.ids as string[];
         const body: Record<string, unknown> = { ids };
         if (args.schedule !== undefined) body.schedule = args.schedule;
 
-        await client.post('blocked_services/update', body);
+        await client.post("blocked_services/update", body);
         return `Blocked services updated (${ids.length} services).`;
       },
     },
