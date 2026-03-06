@@ -5,17 +5,18 @@
  * Reads env vars, validates AdGuard Home connection, starts MCP server.
  */
 
-import { loadConfig } from './core/config.js';
-import { AdGuardClient } from './core/client.js';
-import { createServer, startServer } from './core/server.js';
-import { logger } from './core/logger.js';
-import { registerAllTools } from './tools/index.js';
+import { AdGuardClient } from "./core/client.js";
+import { loadConfig } from "./core/config.js";
+import { logger } from "./core/logger.js";
+import { createServer, startServer } from "./core/server.js";
+import { registerAllTools } from "./tools/index.js";
+import type { AppConfig } from "./types/index.js";
 
 async function main(): Promise<void> {
-  logger.info('mcp-adguard-home starting...');
+  logger.info("mcp-adguard-home starting...");
 
   // Load and validate configuration
-  let config;
+  let config: AppConfig;
   try {
     config = loadConfig();
   } catch (err) {
@@ -35,7 +36,7 @@ async function main(): Promise<void> {
   logger.info(`Connected to AdGuard Home at ${config.url}`);
   logger.info(`Access tier: ${config.accessTier}`);
   logger.info(
-    `Categories: ${config.categories ? config.categories.join(', ') : 'all (no filter)'}`,
+    `Categories: ${config.categories ? config.categories.join(", ") : "all (no filter)"}`,
   );
 
   // Create MCP server
@@ -48,6 +49,8 @@ async function main(): Promise<void> {
 }
 
 main().catch((err) => {
-  logger.error(`Fatal error: ${err instanceof Error ? err.message : String(err)}`);
+  logger.error(
+    `Fatal error: ${err instanceof Error ? err.message : String(err)}`,
+  );
   process.exit(1);
 });

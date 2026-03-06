@@ -2,11 +2,11 @@
  * Query log tools: DNS query history and configuration.
  */
 
-import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { AppConfig } from '../types/index.js';
-import { AdGuardClient } from '../core/client.js';
-import { registerTool } from '../core/tools.js';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+import type { AdGuardClient } from "../core/client.js";
+import { registerTool } from "../core/tools.js";
+import type { AppConfig } from "../types/index.js";
 
 // --- Local response interfaces ---
 
@@ -49,19 +49,19 @@ interface QueryLogConfig {
 function formatQueryLog(data: QueryLogResponse): string {
   const entries = data.data || [];
   if (entries.length === 0) {
-    return 'No query log entries.';
+    return "No query log entries.";
   }
 
   const lines: string[] = [`Query Log (${entries.length} entries)`];
 
   for (const entry of entries) {
-    const ts = entry.time ? entry.time.replace('T', ' ').substring(0, 19) : '?';
-    const domain = entry.question?.name || '?';
-    const qtype = entry.question?.type || '?';
-    const clientIp = entry.client || '?';
-    const rcode = entry.status || '?';
-    const elapsed = entry.elapsed_ms || '?';
-    const reason = entry.reason || 'NotFiltered';
+    const ts = entry.time ? entry.time.replace("T", " ").substring(0, 19) : "?";
+    const domain = entry.question?.name || "?";
+    const qtype = entry.question?.type || "?";
+    const clientIp = entry.client || "?";
+    const rcode = entry.status || "?";
+    const elapsed = entry.elapsed_ms || "?";
+    const reason = entry.reason || "NotFiltered";
 
     let filterInfo = reason;
     if (entry.rules?.length) {
@@ -75,21 +75,21 @@ function formatQueryLog(data: QueryLogResponse): string {
   }
 
   if (data.oldest) {
-    lines.push('');
+    lines.push("");
     lines.push(`Oldest entry: ${data.oldest}`);
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 function formatQueryLogConfig(data: QueryLogConfig): string {
   const lines: string[] = [
-    'Query Log Configuration',
-    `  Enabled: ${data.enabled ? 'yes' : 'no'}`,
+    "Query Log Configuration",
+    `  Enabled: ${data.enabled ? "yes" : "no"}`,
     `  Interval: ${data.interval}h`,
-    `  Anonymize client IP: ${data.anonymize_client_ip ? 'yes' : 'no'}`,
+    `  Anonymize client IP: ${data.anonymize_client_ip ? "yes" : "no"}`,
   ];
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 // --- Registration ---
@@ -102,13 +102,17 @@ export function registerQuerylogTools(
   registerTool(
     server,
     {
-      name: 'querylog_get',
-      title: 'Get Query Log',
+      name: "querylog_get",
+      title: "Get Query Log",
       description:
-        'Search DNS query log with optional filtering by response status, search term, and pagination',
-      category: 'querylog',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+        "Search DNS query log with optional filtering by response status, search term, and pagination",
+      category: "querylog",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {
         older_than: z.string().optional(),
         offset: z.number().optional(),
@@ -116,31 +120,31 @@ export function registerQuerylogTools(
         search: z.string().optional(),
         response_status: z
           .enum([
-            'all',
-            'filtered',
-            'blocked',
-            'blocked_safebrowsing',
-            'blocked_parental',
-            'whitelisted',
-            'rewritten',
-            'safe_search',
-            'processed',
+            "all",
+            "filtered",
+            "blocked",
+            "blocked_safebrowsing",
+            "blocked_parental",
+            "whitelisted",
+            "rewritten",
+            "safe_search",
+            "processed",
           ])
           .optional(),
       },
       handler: async (args) => {
         const params = new URLSearchParams();
         if (args.older_than)
-          params.set('older_than', args.older_than as string);
+          params.set("older_than", args.older_than as string);
         if (args.offset !== undefined)
-          params.set('offset', String(args.offset));
-        if (args.limit !== undefined) params.set('limit', String(args.limit));
-        if (args.search) params.set('search', args.search as string);
+          params.set("offset", String(args.offset));
+        if (args.limit !== undefined) params.set("limit", String(args.limit));
+        if (args.search) params.set("search", args.search as string);
         if (args.response_status)
-          params.set('response_status', args.response_status as string);
+          params.set("response_status", args.response_status as string);
 
         const query = params.toString();
-        const path = query ? `querylog?${query}` : 'querylog';
+        const path = query ? `querylog?${query}` : "querylog";
         const data = (await client.get(path)) as QueryLogResponse;
         return formatQueryLog(data);
       },
@@ -151,15 +155,19 @@ export function registerQuerylogTools(
   registerTool(
     server,
     {
-      name: 'querylog_get_config',
-      title: 'Get Query Log Configuration',
-      description: 'Retrieve query log configuration settings',
-      category: 'querylog',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+      name: "querylog_get_config",
+      title: "Get Query Log Configuration",
+      description: "Retrieve query log configuration settings",
+      category: "querylog",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {},
       handler: async () => {
-        const data = (await client.get('querylog/config')) as QueryLogConfig;
+        const data = (await client.get("querylog/config")) as QueryLogConfig;
         return formatQueryLogConfig(data);
       },
     },
@@ -171,23 +179,30 @@ export function registerQuerylogTools(
   registerTool(
     server,
     {
-      name: 'querylog_set_config',
-      title: 'Set Query Log Configuration',
+      name: "querylog_set_config",
+      title: "Set Query Log Configuration",
       description:
-        'Update query log configuration. All fields are optional -- only provided fields are changed.',
-      category: 'querylog',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+        "Update query log configuration. All fields are optional -- only provided fields are changed.",
+      category: "querylog",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {
-        enabled: z.boolean().optional().describe('Enable/disable query logging'),
+        enabled: z
+          .boolean()
+          .optional()
+          .describe("Enable/disable query logging"),
         interval: z
           .number()
           .optional()
-          .describe('Query log retention interval in milliseconds'),
+          .describe("Query log retention interval in milliseconds"),
         anonymize_client_ip: z
           .boolean()
           .optional()
-          .describe('Anonymize client IP addresses in the log'),
+          .describe("Anonymize client IP addresses in the log"),
       },
       handler: async (args) => {
         const body: Record<string, unknown> = {};
@@ -195,8 +210,8 @@ export function registerQuerylogTools(
         if (args.interval !== undefined) body.interval = args.interval;
         if (args.anonymize_client_ip !== undefined)
           body.anonymize_client_ip = args.anonymize_client_ip;
-        await client.post('querylog/config/update', body);
-        return 'Query log configuration updated.';
+        await client.post("querylog/config/update", body);
+        return "Query log configuration updated.";
       },
     },
     config,
@@ -205,17 +220,21 @@ export function registerQuerylogTools(
   registerTool(
     server,
     {
-      name: 'querylog_clear',
-      title: 'Clear Query Log',
+      name: "querylog_clear",
+      title: "Clear Query Log",
       description:
-        'Clear the entire DNS query log. This is a destructive operation that cannot be undone.',
-      category: 'querylog',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+        "Clear the entire DNS query log. This is a destructive operation that cannot be undone.",
+      category: "querylog",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {},
       handler: async () => {
-        await client.post('querylog_clear');
-        return 'Query log cleared.';
+        await client.post("querylog_clear");
+        return "Query log cleared.";
       },
     },
     config,

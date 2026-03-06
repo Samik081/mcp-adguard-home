@@ -16,20 +16,20 @@ export function sanitizeMessage(
 
   // Replace password first (may be substring of other values)
   if (config.password) {
-    sanitized = sanitized.replaceAll(config.password, '[REDACTED]');
+    sanitized = sanitized.replaceAll(config.password, "[REDACTED]");
   }
 
   // Replace username
   if (config.username) {
-    sanitized = sanitized.replaceAll(config.username, '[REDACTED]');
+    sanitized = sanitized.replaceAll(config.username, "[REDACTED]");
   }
 
   // Replace Base64-encoded auth string
   const base64Auth = Buffer.from(
     `${config.username}:${config.password}`,
-  ).toString('base64');
+  ).toString("base64");
   if (base64Auth) {
-    sanitized = sanitized.replaceAll(base64Auth, '[REDACTED]');
+    sanitized = sanitized.replaceAll(base64Auth, "[REDACTED]");
   }
 
   return sanitized;
@@ -43,7 +43,7 @@ export class AdGuardError extends Error {
 
   constructor(message: string, statusCode?: number) {
     super(message);
-    this.name = 'AdGuardError';
+    this.name = "AdGuardError";
     this.statusCode = statusCode;
   }
 }
@@ -63,9 +63,9 @@ export function createSafeError(
     return safeError;
   }
 
-  if (typeof err === 'string') {
+  if (typeof err === "string") {
     return new Error(sanitizeMessage(err, config));
   }
 
-  return new Error('An unknown error occurred');
+  return new Error("An unknown error occurred");
 }

@@ -2,11 +2,11 @@
  * DNS rewrite tools: list rules and module settings.
  */
 
-import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { AppConfig } from '../types/index.js';
-import { AdGuardClient } from '../core/client.js';
-import { registerTool } from '../core/tools.js';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+import type { AdGuardClient } from "../core/client.js";
+import { registerTool } from "../core/tools.js";
+import type { AppConfig } from "../types/index.js";
 
 // --- Local response interfaces ---
 
@@ -23,15 +23,15 @@ interface RewriteSettings {
 
 function formatRewrites(rules: RewriteRule[]): string {
   if (rules.length === 0) {
-    return 'No rewrite rules configured.';
+    return "No rewrite rules configured.";
   }
 
   const lines: string[] = [`DNS Rewrite Rules (${rules.length})`];
-  lines.push('  Domain -> Answer');
+  lines.push("  Domain -> Answer");
   for (const r of rules) {
     lines.push(`  ${r.domain} -> ${r.answer}`);
   }
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 // --- Registration ---
@@ -44,15 +44,19 @@ export function registerRewritesTools(
   registerTool(
     server,
     {
-      name: 'rewrites_list',
-      title: 'List DNS Rewrites',
-      description: 'Retrieve all configured DNS rewrite rules',
-      category: 'rewrites',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+      name: "rewrites_list",
+      title: "List DNS Rewrites",
+      description: "Retrieve all configured DNS rewrite rules",
+      category: "rewrites",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {},
       handler: async () => {
-        const data = (await client.get('rewrite/list')) as RewriteRule[];
+        const data = (await client.get("rewrite/list")) as RewriteRule[];
         return formatRewrites(data);
       },
     },
@@ -62,18 +66,20 @@ export function registerRewritesTools(
   registerTool(
     server,
     {
-      name: 'rewrites_get_settings',
-      title: 'Get Rewrite Settings',
-      description: 'Retrieve DNS rewrite module enabled/disabled state',
-      category: 'rewrites',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+      name: "rewrites_get_settings",
+      title: "Get Rewrite Settings",
+      description: "Retrieve DNS rewrite module enabled/disabled state",
+      category: "rewrites",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {},
       handler: async () => {
-        const data = (await client.get(
-          'rewrite/settings',
-        )) as RewriteSettings;
-        return `DNS Rewrites: ${data.enabled ? 'enabled' : 'disabled'}`;
+        const data = (await client.get("rewrite/settings")) as RewriteSettings;
+        return `DNS Rewrites: ${data.enabled ? "enabled" : "disabled"}`;
       },
     },
     config,
@@ -84,20 +90,26 @@ export function registerRewritesTools(
   registerTool(
     server,
     {
-      name: 'rewrites_add',
-      title: 'Add DNS Rewrite',
-      description: 'Add a new DNS rewrite rule',
-      category: 'rewrites',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false },
+      name: "rewrites_add",
+      title: "Add DNS Rewrite",
+      description: "Add a new DNS rewrite rule",
+      category: "rewrites",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+      },
       inputSchema: {
-        domain: z.string().describe('Domain pattern to rewrite'),
-        answer: z.string().describe('Answer to return (IP address, domain, or special value)'),
+        domain: z.string().describe("Domain pattern to rewrite"),
+        answer: z
+          .string()
+          .describe("Answer to return (IP address, domain, or special value)"),
       },
       handler: async (args) => {
         const domain = args.domain as string;
         const answer = args.answer as string;
-        await client.post('rewrite/add', { domain, answer });
+        await client.post("rewrite/add", { domain, answer });
         return `Rewrite added: ${domain} -> ${answer}.`;
       },
     },
@@ -107,24 +119,28 @@ export function registerRewritesTools(
   registerTool(
     server,
     {
-      name: 'rewrites_update',
-      title: 'Update DNS Rewrite',
+      name: "rewrites_update",
+      title: "Update DNS Rewrite",
       description:
-        'Update a DNS rewrite rule (removes existing rule and adds updated one)',
-      category: 'rewrites',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+        "Update a DNS rewrite rule (removes existing rule and adds updated one)",
+      category: "rewrites",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {
-        domain: z.string().describe('Current domain of the rule to update'),
-        answer: z.string().describe('Current answer of the rule to update'),
+        domain: z.string().describe("Current domain of the rule to update"),
+        answer: z.string().describe("Current answer of the rule to update"),
         new_domain: z
           .string()
           .optional()
-          .describe('New domain (defaults to current)'),
+          .describe("New domain (defaults to current)"),
         new_answer: z
           .string()
           .optional()
-          .describe('New answer (defaults to current)'),
+          .describe("New answer (defaults to current)"),
       },
       handler: async (args) => {
         const domain = args.domain as string;
@@ -133,12 +149,12 @@ export function registerRewritesTools(
         const newAnswer = (args.new_answer as string) || answer;
 
         // Remove existing rule, then add updated one
-        await client.post('rewrite/delete', { domain, answer });
-        await client.post('rewrite/add', {
+        await client.post("rewrite/delete", { domain, answer });
+        await client.post("rewrite/add", {
           domain: newDomain,
           answer: newAnswer,
         });
-        return 'Rewrite updated.';
+        return "Rewrite updated.";
       },
     },
     config,
@@ -147,22 +163,26 @@ export function registerRewritesTools(
   registerTool(
     server,
     {
-      name: 'rewrites_delete',
-      title: 'Delete DNS Rewrite',
+      name: "rewrites_delete",
+      title: "Delete DNS Rewrite",
       description:
-        'Delete a DNS rewrite rule (both domain and answer must match)',
-      category: 'rewrites',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
+        "Delete a DNS rewrite rule (both domain and answer must match)",
+      category: "rewrites",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+      },
       inputSchema: {
-        domain: z.string().describe('Domain of the rule to delete'),
-        answer: z.string().describe('Answer of the rule to delete'),
+        domain: z.string().describe("Domain of the rule to delete"),
+        answer: z.string().describe("Answer of the rule to delete"),
       },
       handler: async (args) => {
         const domain = args.domain as string;
         const answer = args.answer as string;
-        await client.post('rewrite/delete', { domain, answer });
-        return 'Rewrite deleted.';
+        await client.post("rewrite/delete", { domain, answer });
+        return "Rewrite deleted.";
       },
     },
     config,
@@ -171,19 +191,25 @@ export function registerRewritesTools(
   registerTool(
     server,
     {
-      name: 'rewrites_set_settings',
-      title: 'Set Rewrite Settings',
-      description: 'Enable or disable the DNS rewrite module',
-      category: 'rewrites',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+      name: "rewrites_set_settings",
+      title: "Set Rewrite Settings",
+      description: "Enable or disable the DNS rewrite module",
+      category: "rewrites",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {
-        enabled: z.boolean().describe('Whether to enable or disable DNS rewrites'),
+        enabled: z
+          .boolean()
+          .describe("Whether to enable or disable DNS rewrites"),
       },
       handler: async (args) => {
         const enabled = args.enabled as boolean;
-        await client.post('rewrite/settings/update', { enabled });
-        return `Rewrite module ${enabled ? 'enabled' : 'disabled'}.`;
+        await client.post("rewrite/settings/update", { enabled });
+        return `Rewrite module ${enabled ? "enabled" : "disabled"}.`;
       },
     },
     config,

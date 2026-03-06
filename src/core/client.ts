@@ -4,9 +4,9 @@
  * credential sanitization, and JSON+text response handling.
  */
 
-import type { AppConfig } from '../types/index.js';
-import { createAuthHeader } from './auth.js';
-import { AdGuardError, sanitizeMessage } from './errors.js';
+import type { AppConfig } from "../types/index.js";
+import { createAuthHeader } from "./auth.js";
+import { AdGuardError, sanitizeMessage } from "./errors.js";
 
 /** Request timeout in milliseconds. */
 const REQUEST_TIMEOUT_MS = 30_000;
@@ -30,7 +30,7 @@ export class AdGuardClient {
     const url = `${this.baseUrl}/${path}`;
     try {
       const response = await fetch(url, {
-        method: 'GET',
+        method: "GET",
         headers: {
           Authorization: this.authHeader,
         },
@@ -70,12 +70,12 @@ export class AdGuardClient {
     };
 
     if (body !== undefined) {
-      headers['Content-Type'] = 'application/json';
+      headers["Content-Type"] = "application/json";
     }
 
     try {
       const response = await fetch(url, {
-        method: 'POST',
+        method: "POST",
         headers,
         body: body !== undefined ? JSON.stringify(body) : undefined,
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
@@ -92,18 +92,18 @@ export class AdGuardClient {
       }
 
       // Some AdGuard POST endpoints return empty 200
-      const contentLength = response.headers.get('content-length');
-      if (contentLength === '0') {
-        return '';
+      const contentLength = response.headers.get("content-length");
+      if (contentLength === "0") {
+        return "";
       }
 
       // Try to parse response body; return empty string if no body
       const text = await response.text();
-      if (!text) return '';
+      if (!text) return "";
 
       // Attempt JSON parse if content type suggests it
-      const contentType = response.headers.get('content-type') || '';
-      if (contentType.includes('json')) {
+      const contentType = response.headers.get("content-type") || "";
+      if (contentType.includes("json")) {
         try {
           return JSON.parse(text);
         } catch {
@@ -131,7 +131,7 @@ export class AdGuardClient {
     const url = `${this.baseUrl}/${path}`;
     try {
       const response = await fetch(url, {
-        method: 'GET',
+        method: "GET",
         headers: {
           Authorization: this.authHeader,
         },
@@ -168,7 +168,7 @@ export class AdGuardClient {
     const url = `${this.baseUrl}/status`;
     try {
       const response = await fetch(url, {
-        method: 'GET',
+        method: "GET",
         headers: {
           Authorization: this.authHeader,
         },
@@ -177,7 +177,7 @@ export class AdGuardClient {
 
       if (response.status === 401 || response.status === 403) {
         throw new AdGuardError(
-          'Authentication failed -- check ADGUARD_USERNAME and ADGUARD_PASSWORD',
+          "Authentication failed -- check ADGUARD_USERNAME and ADGUARD_PASSWORD",
           response.status,
         );
       }
@@ -206,9 +206,9 @@ export class AdGuardClient {
    * Parse response based on Content-Type: JSON for 'json' types, text otherwise.
    */
   private async parseResponse(response: Response): Promise<unknown> {
-    const contentType = response.headers.get('content-type') || '';
+    const contentType = response.headers.get("content-type") || "";
 
-    if (contentType.includes('json')) {
+    if (contentType.includes("json")) {
       return await response.json();
     }
 

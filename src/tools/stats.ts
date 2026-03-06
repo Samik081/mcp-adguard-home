@@ -2,11 +2,11 @@
  * Statistics tools: DNS query statistics and configuration.
  */
 
-import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { AppConfig } from '../types/index.js';
-import { AdGuardClient } from '../core/client.js';
-import { registerTool } from '../core/tools.js';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+import type { AdGuardClient } from "../core/client.js";
+import { registerTool } from "../core/tools.js";
+import type { AppConfig } from "../types/index.js";
 
 // --- Local response interfaces ---
 
@@ -54,7 +54,7 @@ function formatTopList(
 
 function formatStats(data: StatsResponse): string {
   const lines: string[] = [
-    'DNS Statistics',
+    "DNS Statistics",
     `  Time units: ${data.time_units}`,
     `  Total queries: ${data.num_dns_queries}`,
     `  Blocked by filters: ${data.num_blocked_filtering}`,
@@ -64,21 +64,21 @@ function formatStats(data: StatsResponse): string {
     `  Avg processing time: ${(data.avg_processing_time * 1000).toFixed(1)}ms`,
   ];
 
-  lines.push(...formatTopList(data.top_queried_domains, 'Top queried domains'));
-  lines.push(...formatTopList(data.top_blocked_domains, 'Top blocked domains'));
-  lines.push(...formatTopList(data.top_clients, 'Top clients'));
+  lines.push(...formatTopList(data.top_queried_domains, "Top queried domains"));
+  lines.push(...formatTopList(data.top_blocked_domains, "Top blocked domains"));
+  lines.push(...formatTopList(data.top_clients, "Top clients"));
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 function formatStatsConfig(data: StatsConfig): string {
   const lines: string[] = [
-    'Statistics Configuration',
-    `  Enabled: ${data.enabled ? 'yes' : 'no'}`,
+    "Statistics Configuration",
+    `  Enabled: ${data.enabled ? "yes" : "no"}`,
     `  Interval: ${data.interval}ms`,
-    `  Ignored domains: ${data.ignored?.length ? data.ignored.join(', ') : 'none'}`,
+    `  Ignored domains: ${data.ignored?.length ? data.ignored.join(", ") : "none"}`,
   ];
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 // --- Registration ---
@@ -91,21 +91,25 @@ export function registerStatsTools(
   registerTool(
     server,
     {
-      name: 'stats_get',
-      title: 'Get Statistics',
+      name: "stats_get",
+      title: "Get Statistics",
       description:
-        'Retrieve DNS statistics including top domains, blocked counts, and client activity. Optional recent param is milliseconds (must be hourly multiple of 3600000).',
-      category: 'stats',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+        "Retrieve DNS statistics including top domains, blocked counts, and client activity. Optional recent param is milliseconds (must be hourly multiple of 3600000).",
+      category: "stats",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {
         recent: z.number().optional(),
       },
       handler: async (args) => {
-        let path = 'stats';
+        let path = "stats";
         if (args.recent !== undefined) {
           const params = new URLSearchParams();
-          params.set('recent', String(args.recent));
+          params.set("recent", String(args.recent));
           path = `stats?${params}`;
         }
         const data = (await client.get(path)) as StatsResponse;
@@ -118,15 +122,19 @@ export function registerStatsTools(
   registerTool(
     server,
     {
-      name: 'stats_get_config',
-      title: 'Get Statistics Configuration',
-      description: 'Retrieve statistics configuration settings',
-      category: 'stats',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+      name: "stats_get_config",
+      title: "Get Statistics Configuration",
+      description: "Retrieve statistics configuration settings",
+      category: "stats",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {},
       handler: async () => {
-        const data = (await client.get('stats/config')) as StatsConfig;
+        const data = (await client.get("stats/config")) as StatsConfig;
         return formatStatsConfig(data);
       },
     },
@@ -138,17 +146,21 @@ export function registerStatsTools(
   registerTool(
     server,
     {
-      name: 'stats_reset',
-      title: 'Reset Statistics',
+      name: "stats_reset",
+      title: "Reset Statistics",
       description:
-        'Reset all DNS statistics. This is a destructive operation that cannot be undone.',
-      category: 'stats',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+        "Reset all DNS statistics. This is a destructive operation that cannot be undone.",
+      category: "stats",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {},
       handler: async () => {
-        await client.post('stats_reset');
-        return 'Statistics reset.';
+        await client.post("stats_reset");
+        return "Statistics reset.";
       },
     },
     config,
@@ -157,31 +169,38 @@ export function registerStatsTools(
   registerTool(
     server,
     {
-      name: 'stats_set_config',
-      title: 'Set Statistics Configuration',
+      name: "stats_set_config",
+      title: "Set Statistics Configuration",
       description:
-        'Update statistics configuration. All fields are optional -- only provided fields are changed.',
-      category: 'stats',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+        "Update statistics configuration. All fields are optional -- only provided fields are changed.",
+      category: "stats",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {
-        enabled: z.boolean().optional().describe('Enable/disable statistics collection'),
+        enabled: z
+          .boolean()
+          .optional()
+          .describe("Enable/disable statistics collection"),
         interval: z
           .number()
           .optional()
-          .describe('Statistics retention interval in milliseconds'),
+          .describe("Statistics retention interval in milliseconds"),
         ignored: z
           .array(z.string())
           .optional()
-          .describe('List of domains to ignore in statistics'),
+          .describe("List of domains to ignore in statistics"),
       },
       handler: async (args) => {
         const body: Record<string, unknown> = {};
         if (args.enabled !== undefined) body.enabled = args.enabled;
         if (args.interval !== undefined) body.interval = args.interval;
         if (args.ignored !== undefined) body.ignored = args.ignored;
-        await client.post('stats/config/update', body);
-        return 'Statistics configuration updated.';
+        await client.post("stats/config/update", body);
+        return "Statistics configuration updated.";
       },
     },
     config,

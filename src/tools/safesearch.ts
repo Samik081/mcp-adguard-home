@@ -2,11 +2,11 @@
  * Safe search tools: per-engine safe search enforcement status and settings.
  */
 
-import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { AppConfig } from '../types/index.js';
-import { AdGuardClient } from '../core/client.js';
-import { registerTool } from '../core/tools.js';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+import type { AdGuardClient } from "../core/client.js";
+import { registerTool } from "../core/tools.js";
+import type { AppConfig } from "../types/index.js";
 
 // --- Local response interfaces ---
 
@@ -18,35 +18,35 @@ interface SafeSearchStatus {
 // --- Formatters ---
 
 const KNOWN_ENGINES = [
-  'bing',
-  'duckduckgo',
-  'google',
-  'pixabay',
-  'yandex',
-  'youtube',
+  "bing",
+  "duckduckgo",
+  "google",
+  "pixabay",
+  "yandex",
+  "youtube",
 ];
 
 function formatSafeSearch(data: SafeSearchStatus): string {
   const lines: string[] = [
-    `Safe Search: ${data.enabled ? 'enabled' : 'disabled'}`,
+    `Safe Search: ${data.enabled ? "enabled" : "disabled"}`,
   ];
 
   for (const engine of KNOWN_ENGINES) {
     if (engine in data) {
       lines.push(
-        `  ${engine}: ${(data as Record<string, boolean>)[engine] ? 'on' : 'off'}`,
+        `  ${engine}: ${(data as Record<string, boolean>)[engine] ? "on" : "off"}`,
       );
     }
   }
 
   // Include any unknown engines not in the known list
   for (const [key, value] of Object.entries(data)) {
-    if (key !== 'enabled' && !KNOWN_ENGINES.includes(key)) {
-      lines.push(`  ${key}: ${value ? 'on' : 'off'}`);
+    if (key !== "enabled" && !KNOWN_ENGINES.includes(key)) {
+      lines.push(`  ${key}: ${value ? "on" : "off"}`);
     }
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 // --- Registration ---
@@ -59,17 +59,21 @@ export function registerSafesearchTools(
   registerTool(
     server,
     {
-      name: 'safesearch_get_status',
-      title: 'Get Safe Search Status',
+      name: "safesearch_get_status",
+      title: "Get Safe Search Status",
       description:
-        'Retrieve safe search settings showing per-engine enforcement status',
-      category: 'safesearch',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+        "Retrieve safe search settings showing per-engine enforcement status",
+      category: "safesearch",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {},
       handler: async () => {
         const data = (await client.get(
-          'safesearch/status',
+          "safesearch/status",
         )) as SafeSearchStatus;
         return formatSafeSearch(data);
       },
@@ -82,21 +86,42 @@ export function registerSafesearchTools(
   registerTool(
     server,
     {
-      name: 'safesearch_set_settings',
-      title: 'Set Safe Search Settings',
+      name: "safesearch_set_settings",
+      title: "Set Safe Search Settings",
       description:
-        'Update safe search settings. Set global enabled state and optionally configure per-engine enforcement.',
-      category: 'safesearch',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+        "Update safe search settings. Set global enabled state and optionally configure per-engine enforcement.",
+      category: "safesearch",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {
-        enabled: z.boolean().describe('Whether safe search is globally enabled'),
-        bing: z.boolean().optional().describe('Enforce safe search on Bing'),
-        duckduckgo: z.boolean().optional().describe('Enforce safe search on DuckDuckGo'),
-        google: z.boolean().optional().describe('Enforce safe search on Google'),
-        pixabay: z.boolean().optional().describe('Enforce safe search on Pixabay'),
-        yandex: z.boolean().optional().describe('Enforce safe search on Yandex'),
-        youtube: z.boolean().optional().describe('Enforce safe search on YouTube'),
+        enabled: z
+          .boolean()
+          .describe("Whether safe search is globally enabled"),
+        bing: z.boolean().optional().describe("Enforce safe search on Bing"),
+        duckduckgo: z
+          .boolean()
+          .optional()
+          .describe("Enforce safe search on DuckDuckGo"),
+        google: z
+          .boolean()
+          .optional()
+          .describe("Enforce safe search on Google"),
+        pixabay: z
+          .boolean()
+          .optional()
+          .describe("Enforce safe search on Pixabay"),
+        yandex: z
+          .boolean()
+          .optional()
+          .describe("Enforce safe search on Yandex"),
+        youtube: z
+          .boolean()
+          .optional()
+          .describe("Enforce safe search on YouTube"),
       },
       handler: async (args) => {
         const body: Record<string, unknown> = {
@@ -107,8 +132,8 @@ export function registerSafesearchTools(
             body[engine] = args[engine];
           }
         }
-        await client.post('safesearch/settings', body);
-        return 'Safe search settings updated.';
+        await client.post("safesearch/settings", body);
+        return "Safe search settings updated.";
       },
     },
     config,

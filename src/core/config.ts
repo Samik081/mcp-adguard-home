@@ -3,15 +3,15 @@
  * Reads required and optional config from process.env.
  */
 
-import type { AccessTier, AppConfig, ToolCategory } from '../types/index.js';
-import { VALID_CATEGORIES } from '../types/index.js';
+import type { AccessTier, AppConfig, ToolCategory } from "../types/index.js";
+import { VALID_CATEGORIES } from "../types/index.js";
 
 function parseToolList(value: string | undefined): string[] | null {
-  if (value === undefined || value === '') {
+  if (value === undefined || value === "") {
     return null;
   }
   return value
-    .split(',')
+    .split(",")
     .map((s) => s.trim())
     .filter((s) => s.length > 0);
 }
@@ -29,25 +29,24 @@ export function loadConfig(): AppConfig {
   const username = process.env.ADGUARD_USERNAME;
   const password = process.env.ADGUARD_PASSWORD;
 
-  // Validate required vars
-  const missing: string[] = [];
-  if (!url) missing.push('ADGUARD_URL');
-  if (!username) missing.push('ADGUARD_USERNAME');
-  if (!password) missing.push('ADGUARD_PASSWORD');
-
-  if (missing.length > 0) {
+  // Validate required vars — guard narrows all three to string
+  if (!url || !username || !password) {
+    const missing: string[] = [];
+    if (!url) missing.push("ADGUARD_URL");
+    if (!username) missing.push("ADGUARD_USERNAME");
+    if (!password) missing.push("ADGUARD_PASSWORD");
     throw new Error(
-      `Missing required environment variables: ${missing.join(', ')}. ` +
-        'Set these variables to connect to your AdGuard Home instance.',
+      `Missing required environment variables: ${missing.join(", ")}. ` +
+        "Set these variables to connect to your AdGuard Home instance.",
     );
   }
 
   // Parse access tier
   const tierRaw = process.env.ADGUARD_ACCESS_TIER;
-  let accessTier: AccessTier = 'full';
+  let accessTier: AccessTier = "full";
   if (tierRaw) {
     const normalized = tierRaw.toLowerCase().trim();
-    if (normalized !== 'read-only' && normalized !== 'full') {
+    if (normalized !== "read-only" && normalized !== "full") {
       throw new Error(
         `Invalid ADGUARD_ACCESS_TIER: "${tierRaw}". Must be "read-only" or "full".`,
       );
@@ -60,7 +59,7 @@ export function loadConfig(): AppConfig {
   let categories: ToolCategory[] | null = null;
   if (categoriesRaw) {
     const parsed = categoriesRaw
-      .split(',')
+      .split(",")
       .map((c) => c.trim().toLowerCase())
       .filter((c) => c.length > 0);
 
@@ -70,8 +69,8 @@ export function loadConfig(): AppConfig {
     );
     if (invalid.length > 0) {
       throw new Error(
-        `Invalid ADGUARD_CATEGORIES: ${invalid.map((c) => `"${c}"`).join(', ')}. ` +
-          `Valid categories: ${VALID_CATEGORIES.join(', ')}`,
+        `Invalid ADGUARD_CATEGORIES: ${invalid.map((c) => `"${c}"`).join(", ")}. ` +
+          `Valid categories: ${VALID_CATEGORIES.join(", ")}`,
       );
     }
 
@@ -83,26 +82,28 @@ export function loadConfig(): AppConfig {
   const toolWhitelist = parseToolList(process.env.ADGUARD_TOOL_WHITELIST);
 
   // Parse tool titles exclusion flag
-  const excludeToolTitles = process.env.MCP_EXCLUDE_TOOL_TITLES === 'true';
+  const excludeToolTitles = process.env.MCP_EXCLUDE_TOOL_TITLES === "true";
 
   // Parse debug flag
   const debug = Boolean(process.env.DEBUG);
 
   const transport =
-    process.env.MCP_TRANSPORT === 'http' ? ('http' as const) : ('stdio' as const);
-  const rawPort = process.env.MCP_PORT ?? '3000';
+    process.env.MCP_TRANSPORT === "http"
+      ? ("http" as const)
+      : ("stdio" as const);
+  const rawPort = process.env.MCP_PORT ?? "3000";
   const httpPort = parseInt(rawPort, 10);
-  if (isNaN(httpPort) || httpPort < 1 || httpPort > 65535) {
+  if (Number.isNaN(httpPort) || httpPort < 1 || httpPort > 65535) {
     throw new Error(
       `Invalid MCP_PORT: "${rawPort}". Must be an integer between 1 and 65535.`,
     );
   }
-  const httpHost = process.env.MCP_HOST ?? '0.0.0.0';
+  const httpHost = process.env.MCP_HOST ?? "0.0.0.0";
 
   return {
-    url: url!.replace(/\/+$/, ''), // Strip trailing slashes
-    username: username!,
-    password: password!,
+    url: url.replace(/\/+$/, ""), // Strip trailing slashes
+    username,
+    password,
     accessTier,
     categories,
     toolBlacklist,

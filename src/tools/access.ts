@@ -2,11 +2,11 @@
  * Access control tools: allowed/disallowed clients and blocked hosts.
  */
 
-import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { AppConfig } from '../types/index.js';
-import { AdGuardClient } from '../core/client.js';
-import { registerTool } from '../core/tools.js';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+import type { AdGuardClient } from "../core/client.js";
+import { registerTool } from "../core/tools.js";
+import type { AppConfig } from "../types/index.js";
 
 // --- Local response interfaces ---
 
@@ -22,26 +22,32 @@ function formatAccessList(data: AccessList): string {
   const sections: string[] = [];
 
   const allowed = data.allowed_clients || [];
-  sections.push(`Allowed Clients${allowed.length ? ` (${allowed.length})` : ': none'}`);
+  sections.push(
+    `Allowed Clients${allowed.length ? ` (${allowed.length})` : ": none"}`,
+  );
   for (const c of allowed) {
     sections.push(`  ${c}`);
   }
 
-  sections.push('');
+  sections.push("");
   const disallowed = data.disallowed_clients || [];
-  sections.push(`Disallowed Clients${disallowed.length ? ` (${disallowed.length})` : ': none'}`);
+  sections.push(
+    `Disallowed Clients${disallowed.length ? ` (${disallowed.length})` : ": none"}`,
+  );
   for (const c of disallowed) {
     sections.push(`  ${c}`);
   }
 
-  sections.push('');
+  sections.push("");
   const blocked = data.blocked_hosts || [];
-  sections.push(`Blocked Hosts${blocked.length ? ` (${blocked.length})` : ': none'}`);
+  sections.push(
+    `Blocked Hosts${blocked.length ? ` (${blocked.length})` : ": none"}`,
+  );
   for (const h of blocked) {
     sections.push(`  ${h}`);
   }
 
-  return sections.join('\n');
+  return sections.join("\n");
 }
 
 // --- Registration ---
@@ -54,16 +60,20 @@ export function registerAccessTools(
   registerTool(
     server,
     {
-      name: 'access_get_list',
-      title: 'Get Access Control List',
+      name: "access_get_list",
+      title: "Get Access Control List",
       description:
-        'Retrieve access control lists: allowed clients, disallowed clients, and blocked hosts',
-      category: 'access',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+        "Retrieve access control lists: allowed clients, disallowed clients, and blocked hosts",
+      category: "access",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {},
       handler: async () => {
-        const data = (await client.get('access/list')) as AccessList;
+        const data = (await client.get("access/list")) as AccessList;
         return formatAccessList(data);
       },
     },
@@ -75,31 +85,35 @@ export function registerAccessTools(
   registerTool(
     server,
     {
-      name: 'access_set_list',
-      title: 'Set Access Control List',
+      name: "access_set_list",
+      title: "Set Access Control List",
       description:
-        'Set access control lists for allowed clients, disallowed clients, and blocked hosts',
-      category: 'access',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+        "Set access control lists for allowed clients, disallowed clients, and blocked hosts",
+      category: "access",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {
         allowed_clients: z
           .array(z.string())
-          .describe('Allowed client IPs/CIDRs/MACs (empty array to clear)'),
+          .describe("Allowed client IPs/CIDRs/MACs (empty array to clear)"),
         disallowed_clients: z
           .array(z.string())
-          .describe('Disallowed client IPs/CIDRs/MACs (empty array to clear)'),
+          .describe("Disallowed client IPs/CIDRs/MACs (empty array to clear)"),
         blocked_hosts: z
           .array(z.string())
-          .describe('Blocked hostnames (empty array to clear)'),
+          .describe("Blocked hostnames (empty array to clear)"),
       },
       handler: async (args) => {
-        await client.post('access/set', {
+        await client.post("access/set", {
           allowed_clients: args.allowed_clients,
           disallowed_clients: args.disallowed_clients,
           blocked_hosts: args.blocked_hosts,
         });
-        return 'Access control lists updated.';
+        return "Access control lists updated.";
       },
     },
     config,

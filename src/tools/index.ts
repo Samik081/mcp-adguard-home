@@ -3,27 +3,26 @@
  * exposes a single registerAllTools() entry point.
  */
 
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { AppConfig } from '../types/index.js';
-import type { AdGuardClient } from '../core/client.js';
-import { validateToolLists } from '../core/tools.js';
-
-import { registerGlobalTools } from './global.js';
-import { registerDnsTools } from './dns.js';
-import { registerQuerylogTools } from './querylog.js';
-import { registerStatsTools } from './stats.js';
-import { registerFilteringTools } from './filtering.js';
-import { registerSafebrowsingTools } from './safebrowsing.js';
-import { registerParentalTools } from './parental.js';
-import { registerSafesearchTools } from './safesearch.js';
-import { registerClientsTools } from './clients.js';
-import { registerDhcpTools } from './dhcp.js';
-import { registerRewritesTools } from './rewrites.js';
-import { registerTlsTools } from './tls.js';
-import { registerBlockedServicesTools } from './blocked_services.js';
-import { registerAccessTools } from './access.js';
-import { registerInstallTools } from './install.js';
-import { registerMobileConfigTools } from './mobile_config.js';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { AdGuardClient } from "../core/client.js";
+import { validateToolLists } from "../core/tools.js";
+import type { AppConfig } from "../types/index.js";
+import { registerAccessTools } from "./access.js";
+import { registerBlockedServicesTools } from "./blocked_services.js";
+import { registerClientsTools } from "./clients.js";
+import { registerDhcpTools } from "./dhcp.js";
+import { registerDnsTools } from "./dns.js";
+import { registerFilteringTools } from "./filtering.js";
+import { registerGlobalTools } from "./global.js";
+import { registerInstallTools } from "./install.js";
+import { registerMobileConfigTools } from "./mobile_config.js";
+import { registerParentalTools } from "./parental.js";
+import { registerQuerylogTools } from "./querylog.js";
+import { registerRewritesTools } from "./rewrites.js";
+import { registerSafebrowsingTools } from "./safebrowsing.js";
+import { registerSafesearchTools } from "./safesearch.js";
+import { registerStatsTools } from "./stats.js";
+import { registerTlsTools } from "./tls.js";
 
 /**
  * Register all read tools with the MCP server.

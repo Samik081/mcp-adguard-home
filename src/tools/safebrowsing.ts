@@ -2,11 +2,11 @@
  * Safe browsing tools: malware/phishing protection status and toggle.
  */
 
-import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { AppConfig } from '../types/index.js';
-import { AdGuardClient } from '../core/client.js';
-import { registerTool } from '../core/tools.js';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+import type { AdGuardClient } from "../core/client.js";
+import { registerTool } from "../core/tools.js";
+import type { AppConfig } from "../types/index.js";
 
 // --- Registration ---
 
@@ -18,19 +18,23 @@ export function registerSafebrowsingTools(
   registerTool(
     server,
     {
-      name: 'safebrowsing_get_status',
-      title: 'Get Safe Browsing Status',
+      name: "safebrowsing_get_status",
+      title: "Get Safe Browsing Status",
       description:
-        'Retrieve safe browsing (malware/phishing protection) status',
-      category: 'safebrowsing',
-      accessTier: 'read-only',
-      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true },
+        "Retrieve safe browsing (malware/phishing protection) status",
+      category: "safebrowsing",
+      accessTier: "read-only",
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      },
       inputSchema: {},
       handler: async () => {
-        const data = (await client.get('safebrowsing/status')) as {
+        const data = (await client.get("safebrowsing/status")) as {
           enabled: boolean;
         };
-        return `Safe Browsing: ${data.enabled ? 'enabled' : 'disabled'}`;
+        return `Safe Browsing: ${data.enabled ? "enabled" : "disabled"}`;
       },
     },
     config,
@@ -41,25 +45,29 @@ export function registerSafebrowsingTools(
   registerTool(
     server,
     {
-      name: 'safebrowsing_set',
-      title: 'Set Safe Browsing',
+      name: "safebrowsing_set",
+      title: "Set Safe Browsing",
       description:
-        'Enable or disable safe browsing (malware/phishing protection)',
-      category: 'safebrowsing',
-      accessTier: 'full',
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+        "Enable or disable safe browsing (malware/phishing protection)",
+      category: "safebrowsing",
+      accessTier: "full",
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+      },
       inputSchema: {
-        enabled: z.boolean().describe('Whether safe browsing should be enabled'),
+        enabled: z
+          .boolean()
+          .describe("Whether safe browsing should be enabled"),
       },
       handler: async (args) => {
         const enabled = args.enabled as boolean;
         const endpoint = enabled
-          ? 'safebrowsing/enable'
-          : 'safebrowsing/disable';
+          ? "safebrowsing/enable"
+          : "safebrowsing/disable";
         await client.post(endpoint);
-        return enabled
-          ? 'Safe browsing enabled.'
-          : 'Safe browsing disabled.';
+        return enabled ? "Safe browsing enabled." : "Safe browsing disabled.";
       },
     },
     config,
