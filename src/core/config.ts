@@ -6,6 +6,16 @@
 import type { AccessTier, AppConfig, ToolCategory } from '../types/index.js';
 import { VALID_CATEGORIES } from '../types/index.js';
 
+function parseToolList(value: string | undefined): string[] | null {
+  if (value === undefined || value === '') {
+    return null;
+  }
+  return value
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+}
+
 /**
  * Load and validate application config from environment variables.
  *
@@ -68,6 +78,10 @@ export function loadConfig(): AppConfig {
     categories = parsed as ToolCategory[];
   }
 
+  // Parse tool blacklist/whitelist
+  const toolBlacklist = parseToolList(process.env.ADGUARD_TOOL_BLACKLIST);
+  const toolWhitelist = parseToolList(process.env.ADGUARD_TOOL_WHITELIST);
+
   // Parse tool titles exclusion flag
   const excludeToolTitles = process.env.MCP_EXCLUDE_TOOL_TITLES === 'true';
 
@@ -91,6 +105,8 @@ export function loadConfig(): AppConfig {
     password: password!,
     accessTier,
     categories,
+    toolBlacklist,
+    toolWhitelist,
     excludeToolTitles,
     debug,
     transport,

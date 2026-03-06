@@ -57,6 +57,8 @@ export interface AppConfig {
   password: string;
   accessTier: AccessTier;
   categories: ToolCategory[] | null;
+  toolBlacklist: string[] | null;
+  toolWhitelist: string[] | null;
   excludeToolTitles: boolean;
   debug: boolean;
   transport: 'stdio' | 'http';

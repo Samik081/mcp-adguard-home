@@ -6,6 +6,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { AppConfig } from '../types/index.js';
 import type { AdGuardClient } from '../core/client.js';
+import { validateToolLists } from '../core/tools.js';
 
 import { registerGlobalTools } from './global.js';
 import { registerDnsTools } from './dns.js';
@@ -50,4 +51,6 @@ export function registerAllTools(
   registerAccessTools(server, client, config);
   registerInstallTools(server, client, config);
   registerMobileConfigTools(server, client, config);
+
+  validateToolLists(config);
 }

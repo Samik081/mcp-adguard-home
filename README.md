@@ -152,6 +152,8 @@ Tools that are not available in your tier are not registered with the MCP server
 | `ADGUARD_PASSWORD` | Yes | -- | Admin password |
 | `ADGUARD_ACCESS_TIER` | No | `full` | `read-only` for read-only tools only, `full` for all tools |
 | `ADGUARD_CATEGORIES` | No | *(all)* | Comma-separated category allowlist (e.g., `dns,filtering,stats`) |
+| `ADGUARD_TOOL_BLACKLIST` | No | *(none)* | Comma-separated list of tool names to exclude (e.g., `dns_clear_cache,stats_reset`) |
+| `ADGUARD_TOOL_WHITELIST` | No | *(none)* | Comma-separated list of tool names to force-include, bypassing access tier and category filters |
 | `DEBUG` | No | `false` | Enable debug logging to stderr |
 | `MCP_TRANSPORT` | No | `stdio` | Transport mode: `stdio` (default) or `http` |
 | `MCP_PORT` | No | `3000` | HTTP server port (only used when `MCP_TRANSPORT=http`) |
