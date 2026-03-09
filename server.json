@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.samik081/mcp-adguard-home",
+  "name": "io.github.Samik081/mcp-adguard-home",
   "version": "0.5.2",
   "title": "AdGuard Home MCP Server",
   "description": "Manage AdGuard Home through AI assistants",
