@@ -17,5 +17,5 @@ USER mcp
 ENV MCP_PORT=3000
 ENV MCP_HOST=0.0.0.0
 EXPOSE 3000
-LABEL io.modelcontextprotocol.server.name="io.github.samik081/mcp-adguard-home"
+LABEL io.modelcontextprotocol.server.name="io.github.Samik081/mcp-adguard-home"
 ENTRYPOINT ["node", "dist/index.js"]
