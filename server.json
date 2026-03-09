@@ -41,7 +41,6 @@
     },
     {
       "registryType": "oci",
-      "registryBaseUrl": "https://ghcr.io",
       "identifier": "ghcr.io/samik081/mcp-adguard-home:0.5.4",
       "version": "0.5.4",
       "runtimeHint": "docker",
