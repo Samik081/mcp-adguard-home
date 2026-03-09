@@ -1,8 +1,9 @@
 {
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.samik081/mcp-adguard-home",
   "version": "0.5.1",
   "title": "AdGuard Home MCP Server",
-  "description": "MCP server exposing the full AdGuard Home REST API as tools for AI assistants",
+  "description": "Manage AdGuard Home through AI assistants",
   "license": "MIT",
   "repository": {
     "type": "git",
