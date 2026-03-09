@@ -1,0 +1,63 @@
+{
+  "name": "io.github.samik081/mcp-adguard-home",
+  "version": "0.5.0",
+  "title": "AdGuard Home MCP Server",
+  "description": "MCP server exposing the full AdGuard Home REST API as tools for AI assistants",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Samik081/mcp-adguard-home.git"
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@samik081/mcp-adguard-home",
+      "version": "0.5.0",
+      "runtimeHint": "node",
+      "environment_variables": [
+        {
+          "name": "ADGUARD_URL",
+          "description": "URL of the AdGuard Home instance (e.g. http://192.168.1.1:3000)",
+          "required": true
+        },
+        {
+          "name": "ADGUARD_USERNAME",
+          "description": "AdGuard Home username",
+          "required": true,
+          "secret": true
+        },
+        {
+          "name": "ADGUARD_PASSWORD",
+          "description": "AdGuard Home password",
+          "required": true,
+          "secret": true
+        }
+      ]
+    },
+    {
+      "registryType": "oci",
+      "identifier": "ghcr.io/samik081/mcp-adguard-home:0.5.0",
+      "version": "0.5.0",
+      "runtimeHint": "docker",
+      "environment_variables": [
+        {
+          "name": "ADGUARD_URL",
+          "description": "URL of the AdGuard Home instance (e.g. http://192.168.1.1:3000)",
+          "required": true
+        },
+        {
+          "name": "ADGUARD_USERNAME",
+          "description": "AdGuard Home username",
+          "required": true,
+          "secret": true
+        },
+        {
+          "name": "ADGUARD_PASSWORD",
+          "description": "AdGuard Home password",
+          "required": true,
+          "secret": true
+        }
+      ]
+    }
+  ]
+}
