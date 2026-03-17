@@ -7,11 +7,9 @@
 
 MCP server for [AdGuard Home](https://adguard.com/pl/adguard-home/overview.html). Manage DNS filtering, clients, DHCP, rewrites, and more through natural language in Cursor, Claude Code, and Claude Desktop.
 
-> **Disclaimer:** Most of this code has been AI-generated and has not been fully tested yet. I created this project for my own needs and plan to continue improving its quality, but it may be buggy in the early stages. If you find a bug, feel free to [open an issue](https://github.com/Samik081/mcp-adguard-home/issues) -- I'll try to work on it in my spare time.
-
 ## Features
 
-- **65 tools** across **16 API categories** covering the complete AdGuard Home API
+- **65 tools** across **16 categories** covering the complete AdGuard Home API
 - **Read-only mode** via `ADGUARD_ACCESS_TIER=read-only` for safe monitoring
 - **Category filtering** via `ADGUARD_CATEGORIES` to expose only the tools you need
 - **Zero HTTP dependencies** -- uses native `fetch` (Node.js 18+)
@@ -166,196 +164,198 @@ Tools that are not available in your tier are not registered with the MCP server
 
 ## Tools
 
+mcp-adguard-home provides 65 tools organized by category. Each tool's Access column shows the minimum tier required: `read-only` (available in both tiers) or `full` (requires `full` tier). The Hints column shows tool behavior: `read-only` (no state changes), `destructive` (modifies existing state), `idempotent` (same result if called twice).
+
 <details>
 <summary>Global (6 tools)</summary>
 
-| Tool | Description |
-|------|-------------|
-| `global_get_status` | Retrieve server status including version, DNS addresses, protection state, and ports |
-| `global_get_profile` | Retrieve user profile (name, language, theme) |
-| `global_check_version` | Check for AdGuard Home updates and compare with current version |
-| `global_set_protection` | Enable or disable DNS protection globally, with optional duration for temporary disable |
-| `global_update_profile` | Update user profile settings (name, language, theme) |
-| `global_begin_update` | Initiate an AdGuard Home software update |
+| Tool | Description | Access | Hints |
+|------|-------------|--------|-------|
+| `global_get_status` | Retrieve server status including version, DNS addresses, protection state, and ports | read-only | read-only, idempotent |
+| `global_get_profile` | Retrieve user profile (name, language, theme) | read-only | read-only, idempotent |
+| `global_check_version` | Check for AdGuard Home updates and compare with current version | read-only | read-only, idempotent |
+| `global_set_protection` | Enable or disable DNS protection globally, with optional duration for temporary disable | full | destructive, idempotent |
+| `global_update_profile` | Update user profile settings (name, language, theme) | full | destructive, idempotent |
+| `global_begin_update` | Initiate an AdGuard Home software update | full | destructive |
 
 </details>
 
 <details>
 <summary>DNS (4 tools)</summary>
 
-| Tool | Description |
-|------|-------------|
-| `dns_get_info` | Retrieve full DNS configuration including upstreams, cache settings, blocking mode, and DNSSEC |
-| `dns_test_upstream` | Test upstream DNS server configuration to verify servers are reachable |
-| `dns_set_config` | Update DNS server configuration (19 optional fields for partial update) |
-| `dns_clear_cache` | Clear the DNS resolver cache |
+| Tool | Description | Access | Hints |
+|------|-------------|--------|-------|
+| `dns_get_info` | Retrieve full DNS configuration including upstreams, cache settings, blocking mode, and DNSSEC | read-only | read-only, idempotent |
+| `dns_test_upstream` | Test upstream DNS server configuration to verify servers are reachable | read-only | read-only, idempotent |
+| `dns_set_config` | Update DNS server configuration (19 optional fields for partial update) | full | destructive, idempotent |
+| `dns_clear_cache` | Clear the DNS resolver cache | full | destructive, idempotent |
 
 </details>
 
 <details>
 <summary>Query Log (4 tools)</summary>
 
-| Tool | Description |
-|------|-------------|
-| `querylog_get` | Search DNS query log with optional filtering by response status, search term, and pagination |
-| `querylog_get_config` | Retrieve query log configuration settings |
-| `querylog_set_config` | Update query log configuration (enabled, interval, anonymization) |
-| `querylog_clear` | Clear the entire DNS query log |
+| Tool | Description | Access | Hints |
+|------|-------------|--------|-------|
+| `querylog_get` | Search DNS query log with optional filtering by response status, search term, and pagination | read-only | read-only, idempotent |
+| `querylog_get_config` | Retrieve query log configuration settings | read-only | read-only, idempotent |
+| `querylog_set_config` | Update query log configuration (enabled, interval, anonymization) | full | destructive, idempotent |
+| `querylog_clear` | Clear the entire DNS query log | full | destructive, idempotent |
 
 </details>
 
 <details>
 <summary>Statistics (4 tools)</summary>
 
-| Tool | Description |
-|------|-------------|
-| `stats_get` | Retrieve DNS statistics including top domains, blocked counts, and client activity |
-| `stats_get_config` | Retrieve statistics configuration settings |
-| `stats_reset` | Reset all DNS statistics |
-| `stats_set_config` | Update statistics configuration (enabled, interval, ignored domains) |
+| Tool | Description | Access | Hints |
+|------|-------------|--------|-------|
+| `stats_get` | Retrieve DNS statistics including top domains, blocked counts, and client activity | read-only | read-only, idempotent |
+| `stats_get_config` | Retrieve statistics configuration settings | read-only | read-only, idempotent |
+| `stats_reset` | Reset all DNS statistics | full | destructive, idempotent |
+| `stats_set_config` | Update statistics configuration (enabled, interval, ignored domains) | full | destructive, idempotent |
 
 </details>
 
 <details>
 <summary>Filtering (8 tools)</summary>
 
-| Tool | Description |
-|------|-------------|
-| `filtering_get_status` | Retrieve filtering configuration including blocklists, allowlists, and user rules |
-| `filtering_check_host` | Test whether a hostname would be blocked by current filtering rules |
-| `filtering_set_config` | Update global filtering configuration (enabled state and update interval) |
-| `filtering_add_url` | Add a new filter URL (blocklist or allowlist) |
-| `filtering_remove_url` | Remove a filter URL from blocklist or allowlist |
-| `filtering_set_url` | Update an existing filter URL (rename, change URL, or enable/disable) |
-| `filtering_refresh` | Force refresh of filter lists to fetch latest updates |
-| `filtering_set_rules` | Set custom filtering rules (replaces all existing custom rules) |
+| Tool | Description | Access | Hints |
+|------|-------------|--------|-------|
+| `filtering_get_status` | Retrieve filtering configuration including blocklists, allowlists, and user rules | read-only | read-only, idempotent |
+| `filtering_check_host` | Test whether a hostname would be blocked by current filtering rules | read-only | read-only, idempotent |
+| `filtering_set_config` | Update global filtering configuration (enabled state and update interval) | full | destructive, idempotent |
+| `filtering_add_url` | Add a new filter URL (blocklist or allowlist) | full | — |
+| `filtering_remove_url` | Remove a filter URL from blocklist or allowlist | full | destructive |
+| `filtering_set_url` | Update an existing filter URL (rename, change URL, or enable/disable) | full | destructive, idempotent |
+| `filtering_refresh` | Force refresh of filter lists to fetch latest updates | full | destructive, idempotent |
+| `filtering_set_rules` | Set custom filtering rules (replaces all existing custom rules) | full | destructive, idempotent |
 
 </details>
 
 <details>
 <summary>Safe Browsing (2 tools)</summary>
 
-| Tool | Description |
-|------|-------------|
-| `safebrowsing_get_status` | Retrieve safe browsing (malware/phishing protection) status |
-| `safebrowsing_set` | Enable or disable safe browsing protection |
+| Tool | Description | Access | Hints |
+|------|-------------|--------|-------|
+| `safebrowsing_get_status` | Retrieve safe browsing (malware/phishing protection) status | read-only | read-only, idempotent |
+| `safebrowsing_set` | Enable or disable safe browsing protection | full | destructive, idempotent |
 
 </details>
 
 <details>
 <summary>Parental (2 tools)</summary>
 
-| Tool | Description |
-|------|-------------|
-| `parental_get_status` | Retrieve parental filtering status |
-| `parental_set` | Enable or disable parental filtering (content restrictions) |
+| Tool | Description | Access | Hints |
+|------|-------------|--------|-------|
+| `parental_get_status` | Retrieve parental filtering status | read-only | read-only, idempotent |
+| `parental_set` | Enable or disable parental filtering (content restrictions) | full | destructive, idempotent |
 
 </details>
 
 <details>
 <summary>Safe Search (2 tools)</summary>
 
-| Tool | Description |
-|------|-------------|
-| `safesearch_get_status` | Retrieve safe search settings showing per-engine enforcement status |
-| `safesearch_set_settings` | Update safe search settings with per-engine configuration (Bing, DuckDuckGo, Google, Pixabay, Yandex, YouTube) |
+| Tool | Description | Access | Hints |
+|------|-------------|--------|-------|
+| `safesearch_get_status` | Retrieve safe search settings showing per-engine enforcement status | read-only | read-only, idempotent |
+| `safesearch_set_settings` | Update safe search settings with per-engine configuration (Bing, DuckDuckGo, Google, Pixabay, Yandex, YouTube) | full | destructive, idempotent |
 
 </details>
 
 <details>
 <summary>Clients (5 tools)</summary>
 
-| Tool | Description |
-|------|-------------|
-| `clients_get` | Retrieve all configured and auto-detected clients with their settings |
-| `clients_search` | Search for specific clients by their IDs (IP, MAC, CIDR, or client ID) |
-| `clients_add` | Add a new persistent client with per-client settings |
-| `clients_update` | Update an existing persistent client by name |
-| `clients_delete` | Delete a persistent client by name |
+| Tool | Description | Access | Hints |
+|------|-------------|--------|-------|
+| `clients_get` | Retrieve all configured and auto-detected clients with their settings | read-only | read-only, idempotent |
+| `clients_search` | Search for specific clients by their IDs (IP, MAC, CIDR, or client ID) | read-only | read-only, idempotent |
+| `clients_add` | Add a new persistent client with per-client settings | full | — |
+| `clients_update` | Update an existing persistent client by name | full | destructive, idempotent |
+| `clients_delete` | Delete a persistent client by name | full | destructive |
 
 </details>
 
 <details>
 <summary>DHCP (9 tools)</summary>
 
-| Tool | Description |
-|------|-------------|
-| `dhcp_get_status` | Retrieve DHCP server configuration, static leases, and active leases |
-| `dhcp_get_interfaces` | Retrieve available network interfaces for DHCP server binding |
-| `dhcp_find_active` | Scan for competing DHCP servers on a network interface |
-| `dhcp_set_config` | Update DHCP server configuration (enabled state, interface, IPv4/IPv6 settings) |
-| `dhcp_add_static_lease` | Add a static DHCP lease mapping a MAC address to an IP |
-| `dhcp_remove_static_lease` | Remove a static DHCP lease |
-| `dhcp_update_static_lease` | Update a static DHCP lease (remove + add pattern) |
-| `dhcp_reset` | Reset DHCP configuration to defaults |
-| `dhcp_reset_leases` | Clear all DHCP leases |
+| Tool | Description | Access | Hints |
+|------|-------------|--------|-------|
+| `dhcp_get_status` | Retrieve DHCP server configuration, static leases, and active leases | read-only | read-only, idempotent |
+| `dhcp_get_interfaces` | Retrieve available network interfaces for DHCP server binding | read-only | read-only, idempotent |
+| `dhcp_find_active` | Scan for competing DHCP servers on a network interface | read-only | read-only, idempotent |
+| `dhcp_set_config` | Update DHCP server configuration (enabled state, interface, IPv4/IPv6 settings) | full | destructive, idempotent |
+| `dhcp_add_static_lease` | Add a static DHCP lease mapping a MAC address to an IP | full | — |
+| `dhcp_remove_static_lease` | Remove a static DHCP lease | full | destructive |
+| `dhcp_update_static_lease` | Update a static DHCP lease (remove + add pattern) | full | destructive, idempotent |
+| `dhcp_reset` | Reset DHCP configuration to defaults | full | destructive, idempotent |
+| `dhcp_reset_leases` | Clear all DHCP leases | full | destructive, idempotent |
 
 </details>
 
 <details>
 <summary>Rewrites (6 tools)</summary>
 
-| Tool | Description |
-|------|-------------|
-| `rewrites_list` | Retrieve all configured DNS rewrite rules |
-| `rewrites_get_settings` | Retrieve DNS rewrite module enabled/disabled state |
-| `rewrites_add` | Add a new DNS rewrite rule |
-| `rewrites_update` | Update a DNS rewrite rule (remove + add pattern) |
-| `rewrites_delete` | Delete a DNS rewrite rule |
-| `rewrites_set_settings` | Enable or disable the DNS rewrite module |
+| Tool | Description | Access | Hints |
+|------|-------------|--------|-------|
+| `rewrites_list` | Retrieve all configured DNS rewrite rules | read-only | read-only, idempotent |
+| `rewrites_get_settings` | Retrieve DNS rewrite module enabled/disabled state | read-only | read-only, idempotent |
+| `rewrites_add` | Add a new DNS rewrite rule | full | — |
+| `rewrites_update` | Update a DNS rewrite rule (remove + add pattern) | full | destructive, idempotent |
+| `rewrites_delete` | Delete a DNS rewrite rule | full | destructive |
+| `rewrites_set_settings` | Enable or disable the DNS rewrite module | full | destructive, idempotent |
 
 </details>
 
 <details>
 <summary>TLS (3 tools)</summary>
 
-| Tool | Description |
-|------|-------------|
-| `tls_get_status` | Retrieve TLS configuration and certificate validation status |
-| `tls_validate` | Validate TLS configuration without applying changes |
-| `tls_set_config` | Update TLS configuration including certificates and HTTPS/DoH/DoT settings |
+| Tool | Description | Access | Hints |
+|------|-------------|--------|-------|
+| `tls_get_status` | Retrieve TLS configuration and certificate validation status | read-only | read-only, idempotent |
+| `tls_validate` | Validate TLS configuration without applying changes | read-only | read-only, idempotent |
+| `tls_set_config` | Update TLS configuration including certificates and HTTPS/DoH/DoT settings | full | destructive, idempotent |
 
 </details>
 
 <details>
 <summary>Blocked Services (3 tools)</summary>
 
-| Tool | Description |
-|------|-------------|
-| `blocked_services_get_all` | List all available services that can be blocked, organized by group |
-| `blocked_services_get` | Retrieve currently blocked services list and schedule |
-| `blocked_services_update` | Update the list of blocked services and optional schedule |
+| Tool | Description | Access | Hints |
+|------|-------------|--------|-------|
+| `blocked_services_get_all` | List all available services that can be blocked, organized by group | read-only | read-only, idempotent |
+| `blocked_services_get` | Retrieve currently blocked services list and schedule | read-only | read-only, idempotent |
+| `blocked_services_update` | Update the list of blocked services and optional schedule | full | destructive, idempotent |
 
 </details>
 
 <details>
 <summary>Access (2 tools)</summary>
 
-| Tool | Description |
-|------|-------------|
-| `access_get_list` | Retrieve access control lists: allowed clients, disallowed clients, and blocked hosts |
-| `access_set_list` | Set access control lists for allowed clients, disallowed clients, and blocked hosts |
+| Tool | Description | Access | Hints |
+|------|-------------|--------|-------|
+| `access_get_list` | Retrieve access control lists: allowed clients, disallowed clients, and blocked hosts | read-only | read-only, idempotent |
+| `access_set_list` | Set access control lists for allowed clients, disallowed clients, and blocked hosts | full | destructive, idempotent |
 
 </details>
 
 <details>
 <summary>Install (3 tools)</summary>
 
-| Tool | Description |
-|------|-------------|
-| `install_get_addresses` | Retrieve network interface details and ports for initial setup |
-| `install_check_config` | Validate install configuration without applying (checks web/DNS binding, credentials) |
-| `install_apply_config` | Apply initial setup configuration (web/DNS binding and admin credentials) |
+| Tool | Description | Access | Hints |
+|------|-------------|--------|-------|
+| `install_get_addresses` | Retrieve network interface details and ports for initial setup | read-only | read-only, idempotent |
+| `install_check_config` | Validate install configuration without applying (checks web/DNS binding, credentials) | full | read-only, idempotent |
+| `install_apply_config` | Apply initial setup configuration (web/DNS binding and admin credentials) | full | destructive |
 
 </details>
 
 <details>
 <summary>Mobile Config (2 tools)</summary>
 
-| Tool | Description |
-|------|-------------|
-| `mobile_config_get_doh` | Generate Apple .mobileconfig profile for DNS-over-HTTPS |
-| `mobile_config_get_dot` | Generate Apple .mobileconfig profile for DNS-over-TLS |
+| Tool | Description | Access | Hints |
+|------|-------------|--------|-------|
+| `mobile_config_get_doh` | Generate Apple .mobileconfig profile for DNS-over-HTTPS | read-only | read-only, idempotent |
+| `mobile_config_get_dot` | Generate Apple .mobileconfig profile for DNS-over-TLS | read-only | read-only, idempotent |
 
 </details>
 
