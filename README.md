@@ -17,6 +17,10 @@ MCP server for [AdGuard Home](https://adguard.com/pl/adguard-home/overview.html)
 - **Remote MCP** via HTTP transport (`MCP_TRANSPORT=http`) using the Streamable HTTP protocol
 - **TypeScript/ESM** with full type safety
 
+## API Compatibility
+
+Tested with AdGuard Home **v0.107.72**.
+
 ## Quick Start
 
 Run the server directly with npx:
