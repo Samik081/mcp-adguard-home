@@ -40,12 +40,13 @@ async function main(): Promise<void> {
   );
 
   // Create MCP server
-  const server = createServer();
-
-  // Register all tools (categories and access tier are filtered internally)
-  registerAllTools(server, client, config);
-
-  await startServer(server, config);
+  const serverFactory = () => {
+    const s = createServer();
+    registerAllTools(s, client, config);
+    return s;
+  };
+  const server = serverFactory();
+  await startServer(server, config, serverFactory);
 }
 
 main().catch((err) => {
