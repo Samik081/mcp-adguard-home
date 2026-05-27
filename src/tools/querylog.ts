@@ -105,7 +105,7 @@ export function registerQuerylogTools(
       name: "querylog_get",
       title: "Get Query Log",
       description:
-        "Search DNS query log with optional filtering by response status, search term, and pagination",
+        "Search DNS query log with optional filtering by reason or response status, search term, and pagination",
       category: "querylog",
       accessTier: "read-only",
       annotations: {
@@ -118,6 +118,27 @@ export function registerQuerylogTools(
         offset: z.number().optional(),
         limit: z.number().optional(),
         search: z.string().optional(),
+        reason: z
+          .array(
+            z.enum([
+              "NotFilteredNotFound",
+              "NotFilteredWhiteList",
+              "NotFilteredError",
+              "FilteredBlackList",
+              "FilteredSafeBrowsing",
+              "FilteredParental",
+              "FilteredInvalid",
+              "FilteredSafeSearch",
+              "FilteredBlockedService",
+              "Rewrite",
+              "RewriteEtcHosts",
+              "RewriteRule",
+            ]),
+          )
+          .optional()
+          .describe(
+            "Filter by one or more filtering reasons. Mutually exclusive with response_status.",
+          ),
         response_status: z
           .enum([
             "all",
@@ -130,9 +151,19 @@ export function registerQuerylogTools(
             "safe_search",
             "processed",
           ])
-          .optional(),
+          .optional()
+          .describe(
+            "Deprecated: use reason instead. Filter by response status. Mutually exclusive with reason.",
+          ),
       },
       handler: async (args) => {
+        const reason = args.reason as string[] | undefined;
+        if (reason?.length && args.response_status) {
+          throw new Error(
+            "Provide either 'reason' or 'response_status', not both -- they are mutually exclusive.",
+          );
+        }
+
         const params = new URLSearchParams();
         if (args.older_than)
           params.set("older_than", args.older_than as string);
@@ -140,6 +171,9 @@ export function registerQuerylogTools(
           params.set("offset", String(args.offset));
         if (args.limit !== undefined) params.set("limit", String(args.limit));
         if (args.search) params.set("search", args.search as string);
+        if (reason?.length) {
+          for (const r of reason) params.append("reason", r);
+        }
         if (args.response_status)
           params.set("response_status", args.response_status as string);
 
