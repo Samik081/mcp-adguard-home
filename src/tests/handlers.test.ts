@@ -95,3 +95,62 @@ describe("handler: global_set_protection (full tier)", () => {
     await cleanup();
   });
 });
+
+describe("handler: querylog_get (reason filter)", () => {
+  let cleanup: () => Promise<void>;
+  let mcpClient: Client;
+  let mockClient: AdGuardClient;
+
+  beforeEach(async () => {
+    mockClient = makeMockClient();
+    const server = createServer();
+    registerAllTools(server, mockClient, makeConfig());
+    const conn = await connectTestClient(server);
+    mcpClient = conn.client;
+    cleanup = conn.cleanup;
+  });
+
+  afterEach(async () => {
+    await cleanup();
+  });
+
+  it("serializes a reason array as repeated query params", async () => {
+    vi.mocked(mockClient.get).mockResolvedValueOnce({ data: [], oldest: "" });
+
+    const result = await mcpClient.callTool({
+      name: "querylog_get",
+      arguments: { reason: ["FilteredBlackList", "Rewrite"] },
+    });
+
+    expect(result.isError).toBeFalsy();
+    const path = vi.mocked(mockClient.get).mock.calls[0][0] as string;
+    expect(path).toBe("querylog?reason=FilteredBlackList&reason=Rewrite");
+  });
+
+  it("still supports the deprecated response_status param", async () => {
+    vi.mocked(mockClient.get).mockResolvedValueOnce({ data: [], oldest: "" });
+
+    await mcpClient.callTool({
+      name: "querylog_get",
+      arguments: { response_status: "blocked" },
+    });
+
+    const path = vi.mocked(mockClient.get).mock.calls[0][0] as string;
+    expect(path).toBe("querylog?response_status=blocked");
+  });
+
+  it("errors when both reason and response_status are supplied", async () => {
+    const result = await mcpClient.callTool({
+      name: "querylog_get",
+      arguments: {
+        reason: ["FilteredBlackList"],
+        response_status: "blocked",
+      },
+    });
+
+    expect(result.isError).toBe(true);
+    const text = (result.content[0] as { type: "text"; text: string }).text;
+    expect(text).toContain("mutually exclusive");
+    expect(mockClient.get).not.toHaveBeenCalled();
+  });
+});
