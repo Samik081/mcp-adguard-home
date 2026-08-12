@@ -191,7 +191,7 @@ mcp-adguard-home provides 65 tools organized by category. Each tool's Access col
 |------|-------------|--------|-------|
 | `dns_get_info` | Retrieve full DNS configuration including upstreams, cache settings, blocking mode, and DNSSEC | read-only | read-only, idempotent |
 | `dns_test_upstream` | Test upstream DNS server configuration to verify servers are reachable | read-only | read-only, idempotent |
-| `dns_set_config` | Update DNS server configuration (19 optional fields for partial update) | full | destructive, idempotent |
+| `dns_set_config` | Update DNS server configuration (20 optional fields for partial update) | full | destructive, idempotent |
 | `dns_clear_cache` | Clear the DNS resolver cache | full | destructive, idempotent |
 
 </details>
