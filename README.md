@@ -12,7 +12,7 @@ MCP server for [AdGuard Home](https://adguard.com/pl/adguard-home/overview.html)
 - **65 tools** across **16 categories** covering the complete AdGuard Home API
 - **Read-only mode** via `ADGUARD_ACCESS_TIER=read-only` for safe monitoring
 - **Category filtering** via `ADGUARD_CATEGORIES` to expose only the tools you need
-- **Zero HTTP dependencies** -- uses native `fetch` (Node.js 18+)
+- **Zero HTTP dependencies** -- uses native `fetch` (Node.js 22+)
 - **Docker images** for `linux/amd64` and `linux/arm64` on [GHCR](https://ghcr.io/samik081/mcp-adguard-home)
 - **Remote MCP** via HTTP transport (`MCP_TRANSPORT=http`) using the Streamable HTTP protocol
 - **TypeScript/ESM** with full type safety
