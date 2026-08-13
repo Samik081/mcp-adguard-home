@@ -16,7 +16,7 @@ interface DnsInfo {
   bootstrap_dns: string[];
   fallback_dns: string[];
   protection_enabled: boolean;
-  rate_limit: number;
+  ratelimit: number;
   blocking_mode: string;
   blocking_ipv4: string;
   blocking_ipv6: string;
@@ -26,6 +26,7 @@ interface DnsInfo {
   dnssec_enabled: boolean;
   disable_ipv6: boolean;
   upstream_mode: string;
+  upstream_timeout?: number;
   cache_size: number;
   cache_ttl_min: number;
   cache_ttl_max: number;
@@ -38,34 +39,81 @@ interface DnsInfo {
 
 // --- Formatters ---
 
+const FORMATTED_DNS_KEYS = new Set([
+  "upstream_dns",
+  "upstream_dns_file",
+  "bootstrap_dns",
+  "fallback_dns",
+  "protection_enabled",
+  "ratelimit",
+  "blocking_mode",
+  "blocking_ipv4",
+  "blocking_ipv6",
+  "edns_cs_enabled",
+  "edns_cs_use_custom",
+  "edns_cs_custom_ip",
+  "dnssec_enabled",
+  "disable_ipv6",
+  "upstream_mode",
+  "upstream_timeout",
+  "cache_size",
+  "cache_ttl_min",
+  "cache_ttl_max",
+  "cache_optimistic",
+  "resolve_clients",
+  "use_private_ptr_resolvers",
+  "local_ptr_upstreams",
+  "default_local_ptr_upstreams",
+]);
+
 function formatDnsInfo(data: DnsInfo): string {
   const lines: string[] = ["DNS Configuration"];
 
   lines.push(
     `  Upstream servers: ${data.upstream_dns.length ? data.upstream_dns.join(", ") : "none"}`,
   );
+  if (data.upstream_dns_file) {
+    lines.push(`  Upstream DNS file: ${data.upstream_dns_file}`);
+  }
   lines.push(
     `  Bootstrap servers: ${data.bootstrap_dns.length ? data.bootstrap_dns.join(", ") : "none"}`,
   );
   lines.push(
     `  Fallback servers: ${data.fallback_dns?.length ? data.fallback_dns.join(", ") : "none"}`,
   );
+  lines.push(`  Upstream mode: ${data.upstream_mode || "load_balance"}`);
+  lines.push(
+    `  Upstream timeout: ${data.upstream_timeout !== undefined ? `${data.upstream_timeout}s` : "unknown"}`,
+  );
   lines.push(
     `  Protection: ${data.protection_enabled ? "enabled" : "disabled"}`,
   );
-  lines.push(`  Rate limit: ${data.rate_limit} req/s`);
+  lines.push(`  Rate limit: ${data.ratelimit} req/s`);
   lines.push(`  Blocking mode: ${data.blocking_mode}`);
+  if (data.blocking_mode === "custom_ip") {
+    lines.push(`  Blocking IPv4: ${data.blocking_ipv4}`);
+    lines.push(`  Blocking IPv6: ${data.blocking_ipv6}`);
+  }
   lines.push(
     `  Cache: ${data.cache_size > 0 ? `enabled (${data.cache_size} entries)` : "disabled"}`,
   );
   lines.push(`  Cache TTL min: ${data.cache_ttl_min}s`);
   lines.push(`  Cache TTL max: ${data.cache_ttl_max}s`);
+  lines.push(
+    `  Optimistic caching: ${data.cache_optimistic ? "enabled" : "disabled"}`,
+  );
   lines.push(`  DNSSEC: ${data.dnssec_enabled ? "enabled" : "disabled"}`);
   lines.push(
     `  EDNS Client Subnet: ${data.edns_cs_enabled ? "enabled" : "disabled"}`,
   );
   lines.push(
-    `  EDNS custom IP: ${data.edns_cs_use_custom ? "enabled" : "disabled"}`,
+    `  EDNS custom IP: ${data.edns_cs_use_custom && data.edns_cs_custom_ip ? data.edns_cs_custom_ip : "not set"}`,
+  );
+  lines.push(
+    `  IPv6 resolution: ${data.disable_ipv6 ? "disabled" : "enabled"}`,
+  );
+  lines.push(
+    `  Local PTR upstreams: ${data.local_ptr_upstreams?.length ? data.local_ptr_upstreams.join(", ") : "none"}`,
   );
   lines.push(
     `  Default local PTR upstreams: ${data.default_local_ptr_upstreams?.length ? data.default_local_ptr_upstreams.join(", ") : "none"}`,
@@ -74,6 +122,17 @@ function formatDnsInfo(data: DnsInfo): string {
   lines.push(
     `  Use private PTR resolvers: ${data.use_private_ptr_resolvers ? "yes" : "no"}`,
   );
+
+  const record = data as unknown as Record<string, unknown>;
+  const extras = Object.keys(record)
+    .filter((key) => !FORMATTED_DNS_KEYS.has(key))
+    .sort();
+  if (extras.length > 0) {
+    lines.push("  Other settings:");
+    for (const key of extras) {
+      lines.push(`    ${key}: ${JSON.stringify(record[key])}`);
+    }
+  }
 
   return lines.join("\n");
 }
@@ -197,7 +256,9 @@ export function registerDnsTools(
         rate_limit: z
           .number()
           .optional()
-          .describe("Rate limit in requests per second"),
+          .describe(
+            "Rate limit in requests per second (sent as AdGuard's 'ratelimit' field)",
+          ),
         blocking_mode: z
           .string()
           .optional()
@@ -225,6 +286,10 @@ export function registerDnsTools(
           .string()
           .optional()
           .describe("Upstream mode (load_balance, parallel, fastest_addr)"),
+        upstream_timeout: z
+          .number()
+          .optional()
+          .describe("Upstream DNS query timeout in seconds"),
         cache_size: z.number().optional().describe("DNS cache size in entries"),
         cache_ttl_min: z
           .number()
@@ -258,7 +323,6 @@ export function registerDnsTools(
           "bootstrap_dns",
           "fallback_dns",
           "protection_enabled",
-          "rate_limit",
           "blocking_mode",
           "blocking_ipv4",
           "blocking_ipv6",
@@ -266,6 +330,7 @@ export function registerDnsTools(
           "dnssec_enabled",
           "disable_ipv6",
           "upstream_mode",
+          "upstream_timeout",
           "cache_size",
           "cache_ttl_min",
           "cache_ttl_max",
@@ -278,6 +343,10 @@ export function registerDnsTools(
           if (args[field] !== undefined) {
             body[field] = args[field];
           }
+        }
+        // AdGuard's API field is `ratelimit`, not `rate_limit`.
+        if (args.rate_limit !== undefined) {
+          body.ratelimit = args.rate_limit;
         }
         await client.post("dns_config", body);
         return "DNS configuration updated.";

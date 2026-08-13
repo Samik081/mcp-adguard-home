@@ -38,18 +38,36 @@ interface ClientsResponse {
   auto_clients: AutoClient[];
 }
 
-interface ClientSearchResult {
-  name: string;
-  ids: string[];
-  use_global_settings: boolean;
-  filtering_enabled: boolean;
-  safebrowsing_enabled: boolean;
-  parental_enabled: boolean;
-  blocked_services: string[];
-  use_global_blocked_services: boolean;
+interface ClientSearchEntry {
+  name?: string;
+  ids?: string[];
+  use_global_settings?: boolean;
+  filtering_enabled?: boolean;
+  safebrowsing_enabled?: boolean;
+  parental_enabled?: boolean;
+  blocked_services?: string[];
+  use_global_blocked_services?: boolean;
+  whois_info?: WhoisInfo;
+  disallowed?: boolean;
+  disallowed_rule?: string;
 }
 
+type ClientSearchResponse = Array<Record<string, ClientSearchEntry>>;
+
 // --- Formatters ---
+
+function formatBlockedServices(
+  services: string[] | undefined,
+  useGlobal: boolean | undefined,
+): string[] {
+  const lines: string[] = [
+    `    Blocked services: ${services?.length ? services.join(", ") : "none"}`,
+  ];
+  if (useGlobal !== undefined) {
+    lines.push(`    Global blocked services: ${useGlobal ? "yes" : "no"}`);
+  }
+  return lines;
+}
 
 function formatConfiguredClient(c: ConfiguredClient): string {
   const lines: string[] = [
@@ -59,7 +77,7 @@ function formatConfiguredClient(c: ConfiguredClient): string {
     `    Filtering: ${c.filtering_enabled ? "on" : "off"}`,
     `    Safe browsing: ${c.safebrowsing_enabled ? "on" : "off"}`,
     `    Parental: ${c.parental_enabled ? "on" : "off"}`,
-    `    Blocked services: ${c.blocked_services.length}`,
+    ...formatBlockedServices(c.blocked_services, c.use_global_blocked_services),
   ];
   return lines.join("\n");
 }
@@ -103,16 +121,50 @@ function formatClients(data: ClientsResponse): string {
   return sections.join("\n");
 }
 
-function formatSearchResult(result: ClientSearchResult): string {
+function formatSearchResult(
+  searchedId: string,
+  entry: ClientSearchEntry,
+): string {
   const lines: string[] = [
-    `  ${result.name}`,
-    `    IDs: ${result.ids.join(", ")}`,
-    `    Global settings: ${result.use_global_settings ? "yes" : "no"}`,
-    `    Filtering: ${result.filtering_enabled ? "on" : "off"}`,
-    `    Safe browsing: ${result.safebrowsing_enabled ? "on" : "off"}`,
-    `    Parental: ${result.parental_enabled ? "on" : "off"}`,
-    `    Blocked services: ${result.blocked_services?.length ?? 0}`,
+    `  Result for ${searchedId}: ${entry.name || "(unnamed)"}`,
   ];
+  if (entry.ids?.length) {
+    lines.push(`    IDs: ${entry.ids.join(", ")}`);
+  }
+  if (entry.use_global_settings !== undefined) {
+    lines.push(
+      `    Global settings: ${entry.use_global_settings ? "yes" : "no"}`,
+    );
+  }
+  if (entry.filtering_enabled !== undefined) {
+    lines.push(`    Filtering: ${entry.filtering_enabled ? "on" : "off"}`);
+  }
+  if (entry.safebrowsing_enabled !== undefined) {
+    lines.push(
+      `    Safe browsing: ${entry.safebrowsing_enabled ? "on" : "off"}`,
+    );
+  }
+  if (entry.parental_enabled !== undefined) {
+    lines.push(`    Parental: ${entry.parental_enabled ? "on" : "off"}`);
+  }
+  lines.push(
+    ...formatBlockedServices(
+      entry.blocked_services,
+      entry.use_global_blocked_services,
+    ),
+  );
+  if (entry.whois_info && Object.keys(entry.whois_info).length > 0) {
+    const whoisParts = Object.entries(entry.whois_info)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(", ");
+    lines.push(`    WHOIS: ${whoisParts}`);
+  }
+  if (entry.disallowed !== undefined) {
+    const rule = entry.disallowed_rule
+      ? ` (rule: ${entry.disallowed_rule})`
+      : "";
+    lines.push(`    Disallowed: ${entry.disallowed ? "yes" : "no"}${rule}`);
+  }
   return lines.join("\n");
 }
 
@@ -165,22 +217,25 @@ export function registerClientsTools(
       },
       handler: async (args) => {
         const ids = args.ids as string[];
-        // PITFALL: Use POST to clients/search, not deprecated GET clients/find
+        // PITFALL: Use POST to clients/search, not deprecated GET clients/find.
+        // Response shape: [{"<searched-id>": {…client entry…}}, …]
         const results = (await client.post("clients/search", {
           clients: ids.map((id) => ({ id })),
-        })) as ClientSearchResult[][];
-
-        if (!results || results.length === 0) {
-          return "No clients found.";
-        }
+        })) as ClientSearchResponse;
 
         const lines: string[] = ["Client Search Results"];
-        for (const resultGroup of results) {
-          for (const r of resultGroup) {
-            lines.push(formatSearchResult(r));
+        const matched = new Set<string>();
+        for (const resultGroup of results ?? []) {
+          for (const [searchedId, entry] of Object.entries(resultGroup)) {
+            matched.add(searchedId);
+            lines.push(formatSearchResult(searchedId, entry));
           }
         }
-
+        for (const id of ids) {
+          if (!matched.has(id)) {
+            lines.push(`  Result for ${id}: no match`);
+          }
+        }
         return lines.join("\n");
       },
     },
