@@ -80,17 +80,14 @@ function formatFilteringStatus(data: FilteringStatus): string {
   const rules = data.user_rules || [];
   // Filter out empty strings that can appear in the rules array
   const nonEmpty = rules.filter((r) => r.trim() !== "");
+
   if (nonEmpty.length === 0) {
     lines.push("User Rules (0)");
     lines.push("  No user rules configured.");
   } else {
     lines.push(`User Rules (${nonEmpty.length})`);
-    const show = nonEmpty.slice(0, 10);
-    for (const rule of show) {
+    for (const rule of nonEmpty) {
       lines.push(`  ${rule}`);
-    }
-    if (nonEmpty.length > 10) {
-      lines.push(`  ... (${nonEmpty.length - 10} more)`);
     }
   }
 
