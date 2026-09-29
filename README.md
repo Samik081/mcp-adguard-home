@@ -202,7 +202,7 @@ mcp-adguard-home provides 65 tools organized by category. Each tool's Access col
 
 | Tool | Description | Access | Hints |
 |------|-------------|--------|-------|
-| `querylog_get` | Search DNS query log with optional filtering by reason or response status, search term, and pagination | read-only | read-only, idempotent |
+| `querylog_get` | Search DNS query log with optional filtering by reason or response status, search term, and cursor pagination via `older_than` (returns a paging hint on empty results) | read-only | read-only, idempotent |
 | `querylog_get_config` | Retrieve query log configuration settings | read-only | read-only, idempotent |
 | `querylog_set_config` | Update query log configuration (enabled, interval, anonymization) | full | destructive, idempotent |
 | `querylog_clear` | Clear the entire DNS query log | full | destructive, idempotent |

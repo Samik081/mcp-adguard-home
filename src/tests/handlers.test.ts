@@ -155,6 +155,86 @@ describe("handler: querylog_get (reason filter)", () => {
   });
 });
 
+describe("handler: querylog_get (empty results and paging)", () => {
+  let cleanup: () => Promise<void>;
+  let mcpClient: Client;
+  let mockClient: AdGuardClient;
+
+  beforeEach(async () => {
+    mockClient = makeMockClient();
+    const server = createServer();
+    registerAllTools(server, mockClient, makeConfig());
+    const conn = await connectTestClient(server);
+    mcpClient = conn.client;
+    cleanup = conn.cleanup;
+  });
+
+  afterEach(async () => {
+    await cleanup();
+  });
+
+  async function callText(args: Record<string, unknown>): Promise<string> {
+    const result = await mcpClient.callTool({
+      name: "querylog_get",
+      arguments: args,
+    });
+    expect(result.isError).toBeFalsy();
+    return (result.content as Array<{ type: "text"; text: string }>)[0].text;
+  }
+
+  it("labels the oldest entry as the next-page cursor", async () => {
+    vi.mocked(mockClient.get).mockResolvedValueOnce({
+      data: [
+        {
+          time: "2026-01-01T10:00:00.5Z",
+          question: { name: "example.com", type: "A" },
+          client: "192.168.1.5",
+          status: "NOERROR",
+          reason: "NotFilteredNotFound",
+        },
+      ],
+      oldest: "2026-01-01T10:00:00.5Z",
+    });
+
+    const text = await callText({ limit: 1 });
+    expect(text).toContain(
+      "Oldest entry: 2026-01-01T10:00:00.5Z (pass as older_than to fetch the next page)",
+    );
+  });
+
+  it("returns a continue-paging hint when the scan window had no matches", async () => {
+    vi.mocked(mockClient.get).mockResolvedValueOnce({
+      data: [],
+      oldest: "2026-01-01T09:00:00Z",
+    });
+
+    const text = await callText({
+      search: "example.com",
+      older_than: "2026-01-01T10:00:00Z",
+    });
+    expect(text).toContain("No matching query log entries");
+    expect(text).toContain('older_than="2026-01-01T09:00:00Z"');
+  });
+
+  it("explains AdGuard's seek limitation when older_than yields nothing", async () => {
+    vi.mocked(mockClient.get).mockResolvedValueOnce({ data: [], oldest: "" });
+
+    const text = await callText({ older_than: "2026-01-01T06:00:00Z" });
+    expect(text).toContain(
+      "No query log entries older than 2026-01-01T06:00:00Z",
+    );
+    expect(text).toContain("cannot seek to an arbitrary timestamp");
+    expect(text).toContain("call without older_than");
+  });
+
+  it("keeps the plain message for an empty log without older_than", async () => {
+    vi.mocked(mockClient.get).mockResolvedValueOnce({ data: [], oldest: "" });
+
+    const text = await callText({});
+    expect(text).toBe("No query log entries.");
+  });
+});
+
 describe("handler: clients_get", () => {
   it("lists blocked service IDs and the global flag", async () => {
     const mockClient = makeMockClient();
