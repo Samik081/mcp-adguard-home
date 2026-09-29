@@ -46,10 +46,37 @@ interface QueryLogConfig {
 
 // --- Formatters ---
 
-function formatQueryLog(data: QueryLogResponse): string {
+function formatEmptyQueryLog(
+  oldest: string | undefined,
+  olderThan: string | undefined,
+): string {
+  // AdGuard scans a bounded window per request when older_than is set; an
+  // empty page with a non-empty `oldest` means "nothing matched yet, keep
+  // paging from here".
+  if (oldest) {
+    return [
+      `No matching query log entries in the scanned window (scanned back to ${oldest}).`,
+      `To keep searching older entries, call again with older_than="${oldest}".`,
+    ].join("\n");
+  }
+  // AdGuard binary-searches the log file for older_than and silently returns
+  // nothing (no error, no `oldest`) when the search gives up, which happens
+  // for arbitrary timestamps in large logs. Only timestamps of real entries
+  // (a previous response's `oldest`) seek reliably.
+  if (olderThan) {
+    return [
+      `No query log entries older than ${olderThan} were returned.`,
+      "This does not necessarily mean none exist: AdGuard Home returns an empty result when it cannot seek to an arbitrary timestamp in a large query log.",
+      'Page from the newest entries instead: call without older_than, then pass each response\'s "Oldest entry" value as the next older_than.',
+    ].join("\n");
+  }
+  return "No query log entries.";
+}
+
+function formatQueryLog(data: QueryLogResponse, olderThan?: string): string {
   const entries = data.data || [];
   if (entries.length === 0) {
-    return "No query log entries.";
+    return formatEmptyQueryLog(data.oldest, olderThan);
   }
 
   const lines: string[] = [`Query Log (${entries.length} entries)`];
@@ -76,7 +103,9 @@ function formatQueryLog(data: QueryLogResponse): string {
 
   if (data.oldest) {
     lines.push("");
-    lines.push(`Oldest entry: ${data.oldest}`);
+    lines.push(
+      `Oldest entry: ${data.oldest} (pass as older_than to fetch the next page)`,
+    );
   }
 
   return lines.join("\n");
@@ -114,10 +143,24 @@ export function registerQuerylogTools(
         idempotentHint: true,
       },
       inputSchema: {
-        older_than: z.string().optional(),
-        offset: z.number().optional(),
-        limit: z.number().optional(),
-        search: z.string().optional(),
+        older_than: z
+          .string()
+          .optional()
+          .describe(
+            "Paging cursor: return entries older than this RFC3339 timestamp. Use the 'Oldest entry' value from a previous response -- AdGuard Home often cannot seek to arbitrary timestamps in large logs and returns nothing for them.",
+          ),
+        offset: z
+          .number()
+          .optional()
+          .describe("Number of matching entries to skip"),
+        limit: z
+          .number()
+          .optional()
+          .describe("Maximum number of entries to return"),
+        search: z
+          .string()
+          .optional()
+          .describe("Filter by domain name or client IP/name substring"),
         reason: z
           .array(
             z.enum([
@@ -180,7 +223,7 @@ export function registerQuerylogTools(
         const query = params.toString();
         const path = query ? `querylog?${query}` : "querylog";
         const data = (await client.get(path)) as QueryLogResponse;
-        return formatQueryLog(data);
+        return formatQueryLog(data, args.older_than as string | undefined);
       },
     },
     config,
