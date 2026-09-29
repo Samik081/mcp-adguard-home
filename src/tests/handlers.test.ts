@@ -305,8 +305,61 @@ describe("handler: dns_get_info", () => {
     expect(text).toContain("Optimistic caching: enabled");
     expect(text).toContain("IPv6 resolution: enabled");
     expect(text).toContain("Local PTR upstreams: 192.168.1.1");
+    expect(text).toContain("Rate limit subnet: /24 IPv4");
+    expect(text).not.toContain("Other settings:");
+    await cleanup();
+  });
+
+  it("prints ratelimit subnet lengths and allowlist in the main section", async () => {
+    const mockClient = makeMockClient();
+    vi.mocked(mockClient.get).mockResolvedValueOnce({
+      upstream_dns: [],
+      bootstrap_dns: [],
+      ratelimit: 120,
+      ratelimit_subnet_len_ipv4: 32,
+      ratelimit_subnet_len_ipv6: 56,
+      ratelimit_whitelist: ["192.168.1.10", "192.168.1.11"],
+      blocked_response_ttl: 10,
+    });
+    const server = createServer();
+    registerAllTools(server, mockClient, makeConfig());
+    const { client, cleanup } = await connectTestClient(server);
+
+    const result = await client.callTool({
+      name: "dns_get_info",
+      arguments: {},
+    });
+
+    expect(result.isError).toBeFalsy();
+    const text = (result.content[0] as { type: "text"; text: string }).text;
+    expect(text).toContain("Rate limit subnet: /32 IPv4, /56 IPv6");
+    expect(text).toContain("Rate limit allowlist: 192.168.1.10, 192.168.1.11");
     expect(text).toContain("Other settings:");
-    expect(text).toContain("ratelimit_subnet_len_ipv4: 24");
+    expect(text).toContain("blocked_response_ttl: 10");
+    expect(text).not.toContain("ratelimit_whitelist:");
+    await cleanup();
+  });
+
+  it("shows an empty ratelimit allowlist as none", async () => {
+    const mockClient = makeMockClient();
+    vi.mocked(mockClient.get).mockResolvedValueOnce({
+      upstream_dns: [],
+      bootstrap_dns: [],
+      ratelimit: 120,
+      ratelimit_whitelist: [],
+    });
+    const server = createServer();
+    registerAllTools(server, mockClient, makeConfig());
+    const { client, cleanup } = await connectTestClient(server);
+
+    const result = await client.callTool({
+      name: "dns_get_info",
+      arguments: {},
+    });
+
+    const text = (result.content[0] as { type: "text"; text: string }).text;
+    expect(text).toContain("Rate limit allowlist: none");
+    expect(text).not.toContain("Rate limit subnet:");
     await cleanup();
   });
 });
@@ -334,6 +387,65 @@ describe("handler: dns_set_config", () => {
       upstream_mode: "parallel",
       ratelimit: 20,
     });
+    await cleanup();
+  });
+
+  it("passes ratelimit subnet lengths and allowlist through", async () => {
+    const mockClient = makeMockClient();
+    vi.mocked(mockClient.post).mockResolvedValueOnce({});
+    const server = createServer();
+    registerAllTools(server, mockClient, makeConfig());
+    const { client, cleanup } = await connectTestClient(server);
+
+    const result = await client.callTool({
+      name: "dns_set_config",
+      arguments: {
+        ratelimit_subnet_len_ipv4: 32,
+        ratelimit_subnet_len_ipv6: 64,
+        ratelimit_whitelist: ["192.168.1.10"],
+      },
+    });
+
+    expect(result.isError).toBeFalsy();
+    expect(mockClient.post).toHaveBeenCalledWith("dns_config", {
+      ratelimit_subnet_len_ipv4: 32,
+      ratelimit_subnet_len_ipv6: 64,
+      ratelimit_whitelist: ["192.168.1.10"],
+    });
+    await cleanup();
+  });
+
+  it("sends an empty ratelimit_whitelist to clear it", async () => {
+    const mockClient = makeMockClient();
+    vi.mocked(mockClient.post).mockResolvedValueOnce({});
+    const server = createServer();
+    registerAllTools(server, mockClient, makeConfig());
+    const { client, cleanup } = await connectTestClient(server);
+
+    await client.callTool({
+      name: "dns_set_config",
+      arguments: { ratelimit_whitelist: [] },
+    });
+
+    expect(mockClient.post).toHaveBeenCalledWith("dns_config", {
+      ratelimit_whitelist: [],
+    });
+    await cleanup();
+  });
+
+  it("rejects out-of-range subnet lengths", async () => {
+    const mockClient = makeMockClient();
+    const server = createServer();
+    registerAllTools(server, mockClient, makeConfig());
+    const { client, cleanup } = await connectTestClient(server);
+
+    const result = await client.callTool({
+      name: "dns_set_config",
+      arguments: { ratelimit_subnet_len_ipv4: 33 },
+    });
+
+    expect(result.isError).toBe(true);
+    expect(mockClient.post).not.toHaveBeenCalled();
     await cleanup();
   });
 });

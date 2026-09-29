@@ -17,6 +17,9 @@ interface DnsInfo {
   fallback_dns: string[];
   protection_enabled: boolean;
   ratelimit: number;
+  ratelimit_subnet_len_ipv4?: number;
+  ratelimit_subnet_len_ipv6?: number;
+  ratelimit_whitelist?: string[];
   blocking_mode: string;
   blocking_ipv4: string;
   blocking_ipv6: string;
@@ -46,6 +49,9 @@ const FORMATTED_DNS_KEYS = new Set([
   "fallback_dns",
   "protection_enabled",
   "ratelimit",
+  "ratelimit_subnet_len_ipv4",
+  "ratelimit_subnet_len_ipv6",
+  "ratelimit_whitelist",
   "blocking_mode",
   "blocking_ipv4",
   "blocking_ipv6",
@@ -89,6 +95,21 @@ function formatDnsInfo(data: DnsInfo): string {
     `  Protection: ${data.protection_enabled ? "enabled" : "disabled"}`,
   );
   lines.push(`  Rate limit: ${data.ratelimit} req/s`);
+  const subnetLens: string[] = [];
+  if (data.ratelimit_subnet_len_ipv4 !== undefined) {
+    subnetLens.push(`/${data.ratelimit_subnet_len_ipv4} IPv4`);
+  }
+  if (data.ratelimit_subnet_len_ipv6 !== undefined) {
+    subnetLens.push(`/${data.ratelimit_subnet_len_ipv6} IPv6`);
+  }
+  if (subnetLens.length > 0) {
+    lines.push(`  Rate limit subnet: ${subnetLens.join(", ")}`);
+  }
+  if (data.ratelimit_whitelist !== undefined) {
+    lines.push(
+      `  Rate limit allowlist: ${data.ratelimit_whitelist.length ? data.ratelimit_whitelist.join(", ") : "none"}`,
+    );
+  }
   lines.push(`  Blocking mode: ${data.blocking_mode}`);
   if (data.blocking_mode === "custom_ip") {
     lines.push(`  Blocking IPv4: ${data.blocking_ipv4}`);
@@ -259,6 +280,30 @@ export function registerDnsTools(
           .describe(
             "Rate limit in requests per second (sent as AdGuard's 'ratelimit' field)",
           ),
+        ratelimit_subnet_len_ipv4: z
+          .number()
+          .int()
+          .min(0)
+          .max(32)
+          .optional()
+          .describe(
+            "IPv4 subnet prefix length clients are grouped by for rate limiting (32 = per-client, 24 = per /24)",
+          ),
+        ratelimit_subnet_len_ipv6: z
+          .number()
+          .int()
+          .min(0)
+          .max(128)
+          .optional()
+          .describe(
+            "IPv6 subnet prefix length clients are grouped by for rate limiting (128 = per-client)",
+          ),
+        ratelimit_whitelist: z
+          .array(z.string())
+          .optional()
+          .describe(
+            "Client IPs exempt from rate limiting (replaces the whole list; [] clears it)",
+          ),
         blocking_mode: z
           .string()
           .optional()
@@ -323,6 +368,9 @@ export function registerDnsTools(
           "bootstrap_dns",
           "fallback_dns",
           "protection_enabled",
+          "ratelimit_subnet_len_ipv4",
+          "ratelimit_subnet_len_ipv6",
+          "ratelimit_whitelist",
           "blocking_mode",
           "blocking_ipv4",
           "blocking_ipv6",
