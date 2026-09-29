@@ -202,6 +202,35 @@ describe("handler: querylog_get (empty results and paging)", () => {
     );
   });
 
+  it("shows elapsed time from AdGuard's elapsedMs field, rounded", async () => {
+    vi.mocked(mockClient.get).mockResolvedValueOnce({
+      data: [
+        {
+          time: "2026-01-01T10:00:00Z",
+          question: { name: "example.com", type: "A" },
+          client: "192.168.1.5",
+          status: "NOERROR",
+          reason: "NotFilteredNotFound",
+          elapsedMs: "12.345678",
+        },
+        {
+          time: "2026-01-01T09:59:59Z",
+          question: { name: "example.org", type: "A" },
+          client: "192.168.1.5",
+          status: "NOERROR",
+          reason: "NotFilteredNotFound",
+        },
+      ],
+      oldest: "2026-01-01T09:59:59Z",
+    });
+
+    const text = await callText({});
+    expect(text).toContain(
+      "| example.com A | 192.168.1.5 | NOERROR | 12.35ms |",
+    );
+    expect(text).toContain("| example.org A | 192.168.1.5 | NOERROR | ?ms |");
+  });
+
   it("returns a continue-paging hint when the scan window had no matches", async () => {
     vi.mocked(mockClient.get).mockResolvedValueOnce({
       data: [],

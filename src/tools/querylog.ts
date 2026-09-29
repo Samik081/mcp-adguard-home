@@ -26,7 +26,8 @@ interface QueryLogEntry {
     ttl: number;
   }>;
   status: string;
-  elapsed_ms: string;
+  /** Milliseconds as a full-precision decimal string, e.g. "12.345678". */
+  elapsedMs?: string;
   reason: string;
   rule?: string;
   filterId?: number;
@@ -87,7 +88,10 @@ function formatQueryLog(data: QueryLogResponse, olderThan?: string): string {
     const qtype = entry.question?.type || "?";
     const clientIp = entry.client || "?";
     const rcode = entry.status || "?";
-    const elapsed = entry.elapsed_ms || "?";
+    const elapsedNum = Number.parseFloat(entry.elapsedMs ?? "");
+    const elapsed = Number.isFinite(elapsedNum)
+      ? String(Math.round(elapsedNum * 100) / 100)
+      : "?";
     const reason = entry.reason || "NotFiltered";
 
     let filterInfo = reason;
