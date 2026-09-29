@@ -26,7 +26,6 @@ interface QueryLogEntry {
     ttl: number;
   }>;
   status: string;
-  /** Milliseconds as a full-precision decimal string, e.g. "12.345678". */
   elapsedMs?: string;
   reason: string;
   rule?: string;
