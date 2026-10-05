@@ -10,7 +10,7 @@
  */
 export function sanitizeMessage(
   message: string,
-  config: { username: string; password: string },
+  config: { username?: string; password?: string },
 ): string {
   let sanitized = message;
 
@@ -25,10 +25,10 @@ export function sanitizeMessage(
   }
 
   // Replace Base64-encoded auth string
-  const base64Auth = Buffer.from(
-    `${config.username}:${config.password}`,
-  ).toString("base64");
-  if (base64Auth) {
+  if (config.username && config.password) {
+    const base64Auth = Buffer.from(
+      `${config.username}:${config.password}`,
+    ).toString("base64");
     sanitized = sanitized.replaceAll(base64Auth, "[REDACTED]");
   }
 
@@ -54,7 +54,7 @@ export class AdGuardError extends Error {
  */
 export function createSafeError(
   err: unknown,
-  config: { username: string; password: string },
+  config: { username?: string; password?: string },
 ): Error {
   if (err instanceof Error) {
     const sanitized = sanitizeMessage(err.message, config);

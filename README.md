@@ -150,8 +150,8 @@ Tools that are not available in your tier are not registered with the MCP server
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `ADGUARD_URL` | Yes | -- | AdGuard Home base URL (e.g., `http://192.168.1.1:3000`) |
-| `ADGUARD_USERNAME` | Yes | -- | Admin username |
-| `ADGUARD_PASSWORD` | Yes | -- | Admin password |
+| `ADGUARD_USERNAME` | No | -- | Admin username. Omit together with `ADGUARD_PASSWORD` if AdGuard Home has authentication disabled |
+| `ADGUARD_PASSWORD` | No | -- | Admin password. Must be set whenever `ADGUARD_USERNAME` is |
 | `ADGUARD_ACCESS_TIER` | No | `full` | `read-only` for read-only tools only, `full` for all tools |
 | `ADGUARD_CATEGORIES` | No | *(all)* | Comma-separated category allowlist (e.g., `dns,filtering,stats`) |
 | `ADGUARD_TOOL_BLACKLIST` | No | *(none)* | Comma-separated list of tool names to exclude (e.g., `dns_clear_cache,stats_reset`) |
@@ -389,6 +389,7 @@ If the connection is working, the assistant will call `global_get_status` and re
 ### Authentication failures
 
 - Verify `ADGUARD_USERNAME` and `ADGUARD_PASSWORD` are correct
+- If AdGuard Home has authentication disabled (no users configured), leave both variables unset
 - Check that the user has admin privileges in AdGuard Home
 
 ### Tools not showing up
