@@ -1,6 +1,6 @@
 /**
  * HTTP client for AdGuard Home API.
- * Uses native fetch (Node 18+) with Basic Auth, /control/ base path,
+ * Uses native fetch (Node 18+) with optional Basic Auth, /control/ base path,
  * credential sanitization, and JSON+text response handling.
  */
 
@@ -13,12 +13,15 @@ const REQUEST_TIMEOUT_MS = 30_000;
 
 export class AdGuardClient {
   private readonly config: AppConfig;
-  private readonly authHeader: string;
+  private readonly authHeader: string | null;
   private readonly baseUrl: string;
 
   constructor(config: AppConfig) {
     this.config = config;
-    this.authHeader = createAuthHeader(config.username, config.password);
+    this.authHeader =
+      config.username && config.password
+        ? createAuthHeader(config.username, config.password)
+        : null;
     this.baseUrl = `${config.url}/control`;
   }
 
@@ -31,9 +34,7 @@ export class AdGuardClient {
     try {
       const response = await fetch(url, {
         method: "GET",
-        headers: {
-          Authorization: this.authHeader,
-        },
+        headers: this.authHeaders(),
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });
 
@@ -65,9 +66,7 @@ export class AdGuardClient {
    */
   async post(path: string, body?: unknown): Promise<unknown> {
     const url = `${this.baseUrl}/${path}`;
-    const headers: Record<string, string> = {
-      Authorization: this.authHeader,
-    };
+    const headers = this.authHeaders();
 
     if (body !== undefined) {
       headers["Content-Type"] = "application/json";
@@ -132,9 +131,7 @@ export class AdGuardClient {
     try {
       const response = await fetch(url, {
         method: "GET",
-        headers: {
-          Authorization: this.authHeader,
-        },
+        headers: this.authHeaders(),
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });
 
@@ -169,15 +166,15 @@ export class AdGuardClient {
     try {
       const response = await fetch(url, {
         method: "GET",
-        headers: {
-          Authorization: this.authHeader,
-        },
+        headers: this.authHeaders(),
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });
 
       if (response.status === 401 || response.status === 403) {
         throw new AdGuardError(
-          "Authentication failed -- check ADGUARD_USERNAME and ADGUARD_PASSWORD",
+          this.authHeader
+            ? "Authentication failed -- check ADGUARD_USERNAME and ADGUARD_PASSWORD"
+            : "AdGuard Home requires authentication -- set ADGUARD_USERNAME and ADGUARD_PASSWORD",
           response.status,
         );
       }
@@ -200,6 +197,11 @@ export class AdGuardClient {
         ),
       );
     }
+  }
+
+  /** Basic Auth header, or none when no credentials are configured. */
+  private authHeaders(): Record<string, string> {
+    return this.authHeader ? { Authorization: this.authHeader } : {};
   }
 
   /**

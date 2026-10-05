@@ -19,25 +19,31 @@ function parseToolList(value: string | undefined): string[] | null {
 /**
  * Load and validate application config from environment variables.
  *
- * Required: ADGUARD_URL, ADGUARD_USERNAME, ADGUARD_PASSWORD
- * Optional: ADGUARD_ACCESS_TIER (default: 'full'), ADGUARD_CATEGORIES (comma-separated), DEBUG
+ * Required: ADGUARD_URL
+ * Optional: ADGUARD_USERNAME + ADGUARD_PASSWORD (set both, or neither when
+ * AdGuard Home has authentication disabled), ADGUARD_ACCESS_TIER (default:
+ * 'full'), ADGUARD_CATEGORIES (comma-separated), DEBUG
  *
  * Throws clear error (no credentials in message) if required vars are missing.
  */
 export function loadConfig(): AppConfig {
   const url = process.env.ADGUARD_URL;
-  const username = process.env.ADGUARD_USERNAME;
-  const password = process.env.ADGUARD_PASSWORD;
+  const username = process.env.ADGUARD_USERNAME || undefined;
+  const password = process.env.ADGUARD_PASSWORD || undefined;
 
-  // Validate required vars — guard narrows all three to string
-  if (!url || !username || !password) {
-    const missing: string[] = [];
-    if (!url) missing.push("ADGUARD_URL");
-    if (!username) missing.push("ADGUARD_USERNAME");
-    if (!password) missing.push("ADGUARD_PASSWORD");
+  if (!url) {
     throw new Error(
-      `Missing required environment variables: ${missing.join(", ")}. ` +
-        "Set these variables to connect to your AdGuard Home instance.",
+      "Missing required environment variable: ADGUARD_URL. " +
+        "Set it to connect to your AdGuard Home instance.",
+    );
+  }
+
+  // Credentials come as a pair; a lone one is almost certainly a typo
+  if ((username === undefined) !== (password === undefined)) {
+    const missing = username ? "ADGUARD_PASSWORD" : "ADGUARD_USERNAME";
+    throw new Error(
+      `Missing environment variable: ${missing}. Set both ADGUARD_USERNAME ` +
+        "and ADGUARD_PASSWORD, or neither if authentication is disabled.",
     );
   }
 

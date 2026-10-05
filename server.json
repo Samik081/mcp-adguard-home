@@ -27,14 +27,14 @@
         },
         {
           "name": "ADGUARD_USERNAME",
-          "description": "AdGuard Home username",
-          "isRequired": true,
+          "description": "AdGuard Home username (omit if authentication is disabled)",
+          "isRequired": false,
           "isSecret": true
         },
         {
           "name": "ADGUARD_PASSWORD",
-          "description": "AdGuard Home password",
-          "isRequired": true,
+          "description": "AdGuard Home password (omit if authentication is disabled)",
+          "isRequired": false,
           "isSecret": true
         }
       ]
@@ -53,14 +53,14 @@
         },
         {
           "name": "ADGUARD_USERNAME",
-          "description": "AdGuard Home username",
-          "isRequired": true,
+          "description": "AdGuard Home username (omit if authentication is disabled)",
+          "isRequired": false,
           "isSecret": true
         },
         {
           "name": "ADGUARD_PASSWORD",
-          "description": "AdGuard Home password",
-          "isRequired": true,
+          "description": "AdGuard Home password (omit if authentication is disabled)",
+          "isRequired": false,
           "isSecret": true
         }
       ]

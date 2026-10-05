@@ -34,6 +34,9 @@ async function main(): Promise<void> {
   }
 
   logger.info(`Connected to AdGuard Home at ${config.url}`);
+  if (!config.username) {
+    logger.info("No credentials set -- connecting without authentication");
+  }
   logger.info(`Access tier: ${config.accessTier}`);
   logger.info(
     `Categories: ${config.categories ? config.categories.join(", ") : "all (no filter)"}`,

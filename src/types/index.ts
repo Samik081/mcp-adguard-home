@@ -53,8 +53,9 @@ export const VALID_CATEGORIES: ToolCategory[] = [
  */
 export interface AppConfig {
   url: string;
-  username: string;
-  password: string;
+  /** Unset (together with password) when AdGuard Home has auth disabled. */
+  username?: string;
+  password?: string;
   accessTier: AccessTier;
   categories: ToolCategory[] | null;
   toolBlacklist: string[] | null;
