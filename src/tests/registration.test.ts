@@ -233,6 +233,20 @@ describe("tool registration", () => {
   });
 
   describe("annotations", () => {
+    it("marks every tool as open-world", async () => {
+      const server = createServer();
+      registerAllTools(server, makeMockClient(), makeConfig());
+      const { client, cleanup } = await connectTestClient(server);
+      const { tools } = await client.listTools();
+      for (const tool of tools) {
+        expect(
+          tool.annotations?.openWorldHint,
+          `${tool.name} missing openWorldHint`,
+        ).toBe(true);
+      }
+      await cleanup();
+    });
+
     it("global_get_status: readOnly, not destructive, idempotent", async () => {
       const server = createServer();
       registerAllTools(server, makeMockClient(), makeConfig());

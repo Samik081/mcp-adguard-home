@@ -76,6 +76,8 @@ export function registerTool(
   const annotations: ToolAnnotations = {
     readOnlyHint: registration.accessTier === "read-only",
     destructiveHint: false,
+    // Every tool calls the AdGuard Home API, an external system.
+    openWorldHint: true,
     ...registration.annotations,
   };
 

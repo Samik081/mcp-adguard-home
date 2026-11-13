@@ -173,7 +173,7 @@ Tools that are not available in your tier are not registered with the MCP server
 
 ## Tools
 
-mcp-adguard-home provides 65 tools organized by category. Each tool's Access column shows the minimum tier required: `read-only` (available in both tiers) or `full` (requires `full` tier). The Hints column shows tool behavior: `read-only` (no state changes), `destructive` (modifies existing state), `idempotent` (same result if called twice).
+mcp-adguard-home provides 65 tools organized by category. Each tool's Access column shows the minimum tier required: `read-only` (available in both tiers) or `full` (requires `full` tier). The Hints column shows tool behavior: `read-only` (no state changes), `destructive` (modifies existing state), `idempotent` (same result if called twice). Every tool also sets `openWorldHint: true`, since each one calls the AdGuard Home API.
 
 <details>
 <summary>Global (6 tools)</summary>
